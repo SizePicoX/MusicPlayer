@@ -449,6 +449,6 @@ public class CurrentMusicList implements Serializable,PlayMode {
      * 调用线程中断使得播放暂停
      */
     public void stop(){
-
+        //?
     }
 }
