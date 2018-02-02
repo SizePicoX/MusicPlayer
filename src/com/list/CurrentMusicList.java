@@ -207,10 +207,12 @@ public class CurrentMusicList implements Serializable,PlayMode {
             /* 随机播放时 */
             else if (currentPlayMode == Mode_Random){
                 //如果priorMusic中没有数据，那么将本次随机序列的数据写入nextMusic中
-                if (indexOfPrior == -1){
+                //或者当Prior数组指针indexOfPrior指向根节点（即为0）时还调用getNextMusic，
+                //则进入到if语句块，往Next数组中写入数据并播放
+                if (indexOfPrior  - 1 <= -1){
 
                     //当indexOfNext不指向栈顶时，一定是调用了getPriorMusic，则indexOfNext加1即可
-                    if (indexOfNext != nextMusic.size()){
+                    if (indexOfNext +1 != nextMusic.size()){
                         ++indexOfNext;
                         currentMusicNode = nextMusic.get(indexOfNext);
                         return currentMusicNode;
@@ -337,14 +339,16 @@ public class CurrentMusicList implements Serializable,PlayMode {
             /* 随机播放时 */
             else if (currentPlayMode == Mode_Random){
                 //如果nextMusic数组里面有数据，则读取并播放
-                if (indexOfNext != -1){
+                //或者当Next数组指针indexOfNext指向根节点时，还要调用getPriorMusic，
+                //则此时需要进入else语句块，即往Prior数组里面写入数据并播放
+                if (indexOfNext - 1 > -1){
                     currentMusicNode = nextMusic.get(--indexOfNext);
                 }
                 //当nextMusic里面没有数据时,向priorMusic中写入数据并播放
                 else {
 
                     //当indexOfPrior不指向栈顶时，则一定时调用了getNextMusic，则将indexOfPrior加1即可
-                    if (indexOfPrior != priorMusic.size()){
+                    if (indexOfPrior + 1 != priorMusic.size()){
                         ++indexOfPrior;
                         currentMusicNode = priorMusic.get(indexOfPrior);
                         return currentMusicNode;
