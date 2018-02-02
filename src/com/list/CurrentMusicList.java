@@ -188,6 +188,7 @@ public class CurrentMusicList implements Serializable,PlayMode {
 
     /**
      * 以设定的currentPlayMode获取下一首歌
+     * 用户按下“下一首”按钮或者本次播放结束后自动调用
      * 当currentMusicNode为空时，返回null
      * 只要调用了该方法，不管原来播放器是暂停的还是怎样的，都会开始播放指针所指向的Music
      */
@@ -197,6 +198,7 @@ public class CurrentMusicList implements Serializable,PlayMode {
 
 
             /* 顺序播放时 */
+            /* 由于是循环双链表，故顺序播放等价于“列表循环” */
             if (currentPlayMode == Mode_Sequential){
                 /* 修改指针 */
                 currentMusicNode = currentMusicNode.next;
@@ -221,6 +223,7 @@ public class CurrentMusicList implements Serializable,PlayMode {
                     /*
                     记录下本次启动随机播放时的currentMusicNode作为根节点
                     根节点只有本次随机播放时间内第一次调用getNextMusic方法才记录
+                    这可以保证从当前位置开始的前几次播放不会播放
                     */
                     if (nextMusic.isEmpty()){
                         nextMusic.add(currentMusicNode);
@@ -229,7 +232,6 @@ public class CurrentMusicList implements Serializable,PlayMode {
 
                     //本次指针偏移量
                     int offset;
-
                     //保证线程安全以及随机播放的前callOfNext次调用都返回不同的乐曲
                     MusicNode node = currentMusicNode;
 
@@ -307,7 +309,7 @@ public class CurrentMusicList implements Serializable,PlayMode {
 
 
             /*
-            单曲循环时
+            单曲循环时，不会自动调用getNextMusic方法
             单曲循环时不用清空nextMusic和priorMusic数组
             */
             else {
@@ -321,6 +323,7 @@ public class CurrentMusicList implements Serializable,PlayMode {
 
     /**
      * 以选定的currentPlayMode获取上一首歌
+     * 当且仅当用户按下“上一首”按钮才会调用
      * 当currentMusicNode为空时，返回null
      * 只要调用了该方法，不管原来播放器是暂停的还是怎样的，都会开始播放指针所指向的Music
      */
@@ -329,6 +332,7 @@ public class CurrentMusicList implements Serializable,PlayMode {
 
 
             /* 顺序播放时 */
+            /* 由于是循环双链表，故顺序播放等价于“列表循环” */
             if (currentPlayMode == Mode_Sequential){
                 /* 修改指针 */
                 currentMusicNode = currentMusicNode.prior;
@@ -438,7 +442,7 @@ public class CurrentMusicList implements Serializable,PlayMode {
 
 
             /*
-            单曲循环时
+            单曲循环时,不会自动调用getNextMusic方法
             单曲循环时不需要清空nextMusic和priorMusic数组
             */
             else {

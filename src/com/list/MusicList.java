@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 
 /*--------------------------------------------------------------------------------------------------------------
-使用链表来存储Music，
+使用循环双链表来存储Music，
 1.方便增加删除，可无限存储而不用动态申请内存
 2.便于排序
 缺点：1.但是没有随机访问的能力，而这种能力在随机播放和搜索的时候是必要的
@@ -25,6 +25,7 @@ import java.io.Serializable;
 
     private  int sum;//歌曲总数
     private  MusicNode FirstMusic;//当前列表第一首乐曲,一开始为空
+    private  MusicNode LastMusic;//列表最后一首歌,用于使双链表循环化
 
     //内存中唯一的tMusicList
     private static transient MusicList musicList;
@@ -60,6 +61,7 @@ import java.io.Serializable;
     public void init(){
         sum = 0;
         FirstMusic = null;
+        LastMusic = null;
     }
 
 
@@ -78,6 +80,12 @@ import java.io.Serializable;
         return FirstMusic;
     }
 
+    /**
+     * @return 获取列表最后一首歌曲
+     */
+    public MusicNode getLastMusic() {
+        return LastMusic;
+    }
 
 
     /*--------------------------------------------------------------------------------------------------------------
@@ -97,8 +105,12 @@ import java.io.Serializable;
         MusicNode newNode = new MusicNode(music);
         //如果列表不为空
         if (FirstMusic != null){
+            //修改指针
             FirstMusic.prior = newNode;
             newNode.next = FirstMusic;
+            newNode.prior = LastMusic;
+            LastMusic.next = newNode;
+            //修改当前列表第一首歌曲
             FirstMusic = newNode;
             ++sum;//歌曲总数加1
             //保存
@@ -107,6 +119,7 @@ import java.io.Serializable;
         //列表为空时
         else {
             FirstMusic = newNode;
+            LastMusic = newNode;
             ++sum;//歌曲总数加1
             //保存
             Implements.Serialize(musicList);
@@ -123,46 +136,46 @@ import java.io.Serializable;
      * @param selectedNode 用于从歌曲链表中删除选定的歌曲
      */
     public void deleteSong(MusicNode selectedNode){
-        //当选定的节点不是第一首乐曲时
-        if (selectedNode != FirstMusic){
+        //当选定的节点不是第一首乐曲也不是最后一首时
+        if (selectedNode != FirstMusic && selectedNode != LastMusic){
             //修改指针
             //选定歌曲的前一首歌
             selectedNode.prior.next = selectedNode.next;
-
-            /*
-            当选定的不是最后一首歌时
-            P.S.是最后一首歌时，最后一首歌的后一个节点不存在
-            */
-            if (selectedNode.next != null){
-                //选定歌曲的后一首歌
-                selectedNode.next.prior = selectedNode.prior;
-            }
-
-            //释放指针
-            MusicNode.DeleteSelectedNode(selectedNode);
-            //歌曲总数减1
-            --sum;
-            //保存
-            Implements.Serialize(musicList);
+            //选定歌曲的后一首歌
+            selectedNode.next.prior = selectedNode.prior;
         }
-        //是当前列表第一个节点时
+        //是当前列表第一个节点时,需要修改当前列表第一首乐曲
+        else if (selectedNode == FirstMusic){
+            //当是第一首歌也是最后一首歌，即列表只有一首歌时
+            if (sum == 1){
+                //修改当前列表第一首歌
+                FirstMusic = null;
+                //修改当前列表最后一首歌
+                LastMusic = null;
+            }
+            else {
+                //修改当前列表第一首歌
+                FirstMusic = selectedNode.next;
+                //修改指针
+                LastMusic.next = FirstMusic;
+                FirstMusic.prior = LastMusic;
+            }
+        }
+        //是当前列表最后一个节点时，同样需要修改当前列表最后一首歌曲
         else {
-
-            /* 当是第一首歌但不是最后一首歌时 */
-            if (selectedNode.next != null){
-                //当前列表第二首歌的前向指针置为空
-                selectedNode.next.prior = null;
-            }
-
-            //修改当前列表第一首歌
-            FirstMusic = selectedNode.next;
-            //释放指针
-            MusicNode.DeleteSelectedNode(selectedNode);
-            //歌曲总数减1
-            --sum;
-            //保存
-            Implements.Serialize(musicList);
+            //修改当前列表最后一首歌
+            LastMusic = selectedNode.prior;
+            //修改指针
+            LastMusic.next = FirstMusic;
+            FirstMusic.prior = LastMusic;
         }
+
+        //释放指针
+        MusicNode.DeleteSelectedNode(selectedNode);
+        //歌曲总数减1
+        --sum;
+        //保存
+        Implements.Serialize(musicList);
     }
 
 
