@@ -167,6 +167,7 @@ public class CurrentMusicList implements Serializable,PlayMode {
         --------------------------------------------------------------------------------------------------------------*/
     }
 
+
     /**
      * @return 返回当前播放模式
      */
@@ -320,6 +321,7 @@ public class CurrentMusicList implements Serializable,PlayMode {
         }
         return null;
     }
+
 
     /**
      * 以选定的currentPlayMode获取上一首歌

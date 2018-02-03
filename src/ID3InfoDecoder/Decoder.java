@@ -9,34 +9,40 @@ import java.io.*;
  * 用以将Mp3文件的ID3头部提取出来
  */
 public class Decoder {
-    private String mp3DilePath;//给定MP3文件路径
+    private String mp3FilePath;//给定MP3文件路径
     private int frameSize;//除去ID3头部的10个字节之外的标签帧大小总和
-    private String ID3_TAG;
+    private String ID3_TAG;//正常情况下应当是"ID3"
     private byte[] buf;//缓存除去ID3头部的10个字节之外的标签帧的所有信息
 
-    public Decoder(String mp3DilePath){
-        this.mp3DilePath = mp3DilePath;//设定文件路径
-        LableHeader ID3Header = new LableHeader(mp3DilePath);
+    public Decoder(String mp3FilePath){
+        /* 设定文件路径 */
+        this.mp3FilePath = mp3FilePath;
+
+        /* 用于获取文件的ID3头部 */
+        LabelHeader ID3Header = new LabelHeader(mp3FilePath);
+        //获取除去ID3头部的10个字节之外的标签帧大小总和
         frameSize = ID3Header.getSize() - 10;
+        //获取ID3头部标签
         ID3_TAG = ID3Header.getHearer();
-        /*--------------------------------------------------------------------------------------------------------------
-        再次打开MP3文件，并且以上面得到的frameSize为大小构造一个字符数组，并将MP3的ID3数据读取进去
-        --------------------------------------------------------------------------------------------------------------*/
+
+        /* 再次打开MP3文件，并且以上面得到的frameSize为大小构造一个字符数组，并将MP3的ID3数据读取进去 */
         try {
             buf = new byte[frameSize];
-            RandomAccessFile raf = new RandomAccessFile(mp3DilePath,"r");
+            RandomAccessFile raf = new RandomAccessFile(mp3FilePath,"r");
             raf.seek(10);//向前移动10个字节，达到第一个标签帧
             raf.read(buf);
             raf.close();
-        }catch (IOException ex){}
+        }catch (IOException ex){
+            //打印程序出错的位置及原因
+            ex.printStackTrace();
+        }
     }
 
     /**
      * @return 如果MP3文件头是ID3，则返回true
      */
     public boolean IS_ID3_OR_NOT(){
-        if (ID3_TAG.equalsIgnoreCase("ID3")) return true;
-        else return false;
+        return ID3_TAG.equalsIgnoreCase("ID3");
     }
 
     /**
@@ -55,7 +61,7 @@ public class Decoder {
         int count = 0;//计数器，当为4时终止循环，代表以取得全部所需要的MP3的ID3信息
 
         //Frame代表每个标签帧
-        LableFrame Frame = new LableFrame(buf);
+        LabelFrame Frame = new LabelFrame(buf);
 
         while (count < 3){
 
@@ -101,7 +107,6 @@ public class Decoder {
     }
 
 
-    //
 
     //--------------------------------------------------------------------------------------------------------------
 
@@ -111,7 +116,6 @@ public class Decoder {
 
     //--------------------------------------------------------------------------------------------------------------
 
-    //
 
     /**
      * @return 根据Decoder给定的MP3的路径，使用jl1.0.1中的软件包得到MP3的时长
@@ -119,7 +123,7 @@ public class Decoder {
      */
     public String getSongTime(){
         String SongTime = null;
-        File file = new File(mp3DilePath);
+        File file = new File(mp3FilePath);
         try{
             FileInputStream fis=new FileInputStream(file);
             try {
@@ -136,7 +140,9 @@ public class Decoder {
                     --------------------------------------------------------------------------------------------------------------*/
                     SongTime = String.valueOf(i / 60) + ":" + String.valueOf(i % 60);
 
-                }catch (BitstreamException ex){}
+                }catch (BitstreamException ex){
+                    ex.printStackTrace();
+                }
         }catch (FileNotFoundException ex){
                     ex.printStackTrace();
             }

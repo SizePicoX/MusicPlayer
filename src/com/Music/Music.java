@@ -19,7 +19,6 @@ public class Music {
 
 
     /**
-     * @return
      * 根据给出的MP3文件路径，初始化它的实例
      */
     private void setMusicInfo(){
@@ -44,11 +43,10 @@ public class Music {
               故通过引入的包中的类来实现
               --------------------------------------------------------------------------------------------------------------*/
 
-//               SongTime = MusicInfo[3];//TIME ，歌曲时长
+//              SongTime = MusicInfo[3];//TIME ，歌曲时长
                 MusicInfo[3] = decoder.getSongTime();
                 SongTime = MusicInfo[3];
                 System.out.println("歌曲时长 " + SongTime);//------------------TEST---------------------------
-
             }catch (UnsupportedEncodingException ex){
                 System.out.println("编码错误，初始化失败！");
             }

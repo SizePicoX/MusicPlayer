@@ -6,14 +6,14 @@ import java.io.UnsupportedEncodingException;
  * 用于存放MP3文件中每个标签帧的头部
  * 使用于Music中
  */
-public class LableFrame {
+public class LabelFrame {
     private String FrameHeader;//标签帧头部，4字节，用于表示此标签内容是什么
     private int Size;//标签帧内容大小，4字节，不包括标签头，不小于1
     private int Flag;//存放标志，2字节，只定义了6 位，没什么用直接置0
 
     private byte[] buf;//待处理的存放所有标签帧的缓冲区
 
-    LableFrame(byte[] buf){
+    LabelFrame(byte[] buf){
         this.buf = buf;
     }
     /**
