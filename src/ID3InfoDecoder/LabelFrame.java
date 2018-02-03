@@ -7,20 +7,38 @@ import java.io.UnsupportedEncodingException;
  * 使用于Music中
  */
 public class LabelFrame {
-    private String FrameHeader;//标签帧头部，4字节，用于表示此标签内容是什么
-    private int Size;//标签帧内容大小，4字节，不包括标签头，不小于1
-    private int Flag;//存放标志，2字节，只定义了6 位，没什么用直接置0
+    /**
+     * 标签帧头部，4字节，用于表示此标签内容是什么
+     */
+    private String FrameHeader;
+    /**
+     * 标签帧内容大小，4字节，不包括标签头，不小于1
+     */
+    private int Size;
+    /**
+     * 存放标志，2字节，只定义了6 位，没什么用直接置0
+     */
+    private int Flag;
 
-    private byte[] buf;//待处理的存放所有标签帧的缓冲区
+    /**
+     * 待处理的存放所有标签帧的缓冲区
+     */
+    private byte[] buf;
 
+
+    /**初始化缓冲区
+     * @param buf 待处理的存放所有标签帧的缓冲区
+     */
     LabelFrame(byte[] buf){
         this.buf = buf;
     }
+
+
     /**
      * @param offset 每个标签帧头部第一个字节在字节数组buf的下标
-     * @throws UnsupportedEncodingException
+     * @throws UnsupportedEncodingException 当标签帧解码失败时抛出
      */
-    public void setLableFrame(int offset) throws UnsupportedEncodingException{
+    public void setLabelFrame(int offset) throws UnsupportedEncodingException{
         FrameHeader = new String(buf,offset,4,"utf-8");
 
         /*--------------------------------------------------------------------------------------------------------------
@@ -40,19 +58,21 @@ public class LabelFrame {
         return FrameHeader;
     }
 
+
     public int getSize() {
         return Size;
     }
+
 
     public int getFlag() {
         return Flag;
     }
 
+
     /**
      * @return 判断当前标签帧是什么类型，如果这条标签帧是TIT2(乐曲名字)，TPE1(歌手)，TALB(专辑),TIME(歌曲时长),则分别返回1,2,3,4
      * 否则返回-1
      */
-
     int judge(){
         if (FrameHeader.equalsIgnoreCase("TIT2")) return 1;//标签帧为“歌曲名字”
         else if (FrameHeader.equalsIgnoreCase("TPE1")) return 2;//标签帧为“歌手”

@@ -16,6 +16,11 @@ class LabelHeader {
     private int Size;//标签大小，4字节，包括标签头的10个字节和所有的标签帧的大小
 
     /**
+     * 修改位，当调用构造函数由于任何原因失败时值为false
+     */
+    private boolean isModify = false;
+
+    /**
      * @param mp3FilePath
      * 用以获取MP3文件的ID3头部
      */
@@ -27,6 +32,8 @@ class LabelHeader {
             raf.close();
         }catch (IOException ex){
             ex.printStackTrace();
+            //发生异常，直接返回
+            return;
         }
         try {
             Hearer = new String(buf,0,3,"utf-8");
@@ -38,6 +45,8 @@ class LabelHeader {
             根据ID3标签的标准，通过按位与运算得到下面的算法
              */
             Size = (buf[6] & 0X7F) * 0x200000 + (buf[7] & 0X7F) * 0x400 + (buf[8] & 0X7F) * 0X80 +(buf[9] & 0X7F);
+            //此时构造函数成功
+            isModify = true;
         }catch (UnsupportedEncodingException ex){
             ex.printStackTrace();
         }
@@ -67,5 +76,13 @@ class LabelHeader {
      */
     public int getSize() {
         return Size;
+    }
+
+
+    /**
+     * @return 如果本次LabelHeader构造函数调用成功，则返回true
+     */
+    public boolean isModify() {
+        return isModify;
     }
 }
