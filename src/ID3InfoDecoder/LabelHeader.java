@@ -32,7 +32,7 @@ class LabelHeader {
             raf.close();
         }catch (IOException ex){
             ex.printStackTrace();
-            //发生异常，直接返回
+            //发生异常，直接返回,避免继续执行
             return;
         }
         try {

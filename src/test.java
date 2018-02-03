@@ -2,10 +2,8 @@
 
 
 //import Implements.Implements;
-import Implements.Implements;
 import com.Music.Music;
 import javazoom.jl.decoder.*;
-import javazoom.jl.player.Player;
 
 import java.io.*;
 
@@ -32,8 +30,16 @@ public class test {
 
         //F:\CloudMusic\怎么唱情歌.mp3
         //F:\CloudMusic\DAOKO,米津玄師 - 打上花火.mp3
-
-        //Music s = new Music("C:\\Users\\www11\\Music\\病名为爱.mp3");
+        //C:\Users\www11\Pictures\Saved Pictures\牧濑红莉栖.JPG
+        Music music;
+        long a = System.currentTimeMillis();
+        String[] buf = Music.setMusicInfo("C:\\Users\\www11\\Music\\DAOKO,米津玄師 - 打上花火.mp3");
+        if (buf[0].equals("true")){
+            music = new Music("C:\\Users\\www11\\Music\\DAOKO,米津玄師 - 打上花火.mp3",buf);
+        }
+        long b = System.currentTimeMillis();
+        System.out.println(b - a);
+        //System.out.println(b - a);
         //long b =System.currentTimeMillis();
 //        for (int i = 0; i <= 999 ; ++i){
 //            System.out.println(Implements.GetRandomNum(1000));
