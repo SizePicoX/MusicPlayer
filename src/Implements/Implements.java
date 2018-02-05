@@ -106,7 +106,7 @@ public class Implements {
             os.close();
         }catch ( ClassNotFoundException ex){
             //当文件为空时
-            CurrentMusicList.getCurrentMusicList().init();
+            CurrentMusicList.init();
         }catch (IOException ex){
             ex.printStackTrace();
         }
@@ -120,7 +120,7 @@ public class Implements {
             os.close();
         }catch (ClassNotFoundException ex){
             //当文件为空时
-            MusicList.getMusicList().init();
+            MusicList.init();
         }catch (IOException ex){
             ex.printStackTrace();
         }

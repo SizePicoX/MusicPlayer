@@ -58,10 +58,12 @@ import java.io.Serializable;
     /**
      * 当列表中没有任何歌曲时将会调用
      */
-    public void init(){
-        sum = 0;
-        FirstMusic = null;
-        LastMusic = null;
+    public static void init(){
+        musicList = new MusicList();
+        //初始化当前列表
+        musicList.sum = 0;
+        musicList.FirstMusic = null;
+        musicList.LastMusic = null;
     }
 
 
@@ -97,12 +99,13 @@ import java.io.Serializable;
     不断调用addSong方法就能得到一张关于Music的链表
     仅要修改链表即可，显示是GUI做的事情
     --------------------------------------------------------------------------------------------------------------*/
-    /**
-     * @param music 被添加的添加歌曲节点
-     */
 
-    public void addSong(Music music){
-        MusicNode newNode = new MusicNode(music);
+
+    /**
+     * 调用该方法前，先创建Music对象再创建MusicNode对象
+     * @param newNode 添加进入列表的MusicNode
+     */
+    public void addSong(MusicNode newNode){
         //如果列表不为空
         if (FirstMusic != null){
             //修改指针
@@ -120,6 +123,9 @@ import java.io.Serializable;
         else {
             FirstMusic = newNode;
             LastMusic = newNode;
+            //修改指针
+            FirstMusic.next = LastMusic;
+            FirstMusic.prior = LastMusic;
             ++sum;//歌曲总数加1
             //保存
             Implements.Serialize(musicList);
@@ -181,11 +187,11 @@ import java.io.Serializable;
 
 
     /**
-     * @param substr 待搜索的字符串，可以是歌曲名字或歌手或专辑中的任意连续字符
+     * @param subStr 待搜索的字符串，可以是歌曲名字或歌手或专辑中的任意连续字符
      *               返回采用KMP算法,遍历链表得到的匹配项
      * P.S.边计算边调用GU的显示程序，在GUI中显示匹配项(其他不匹配的不显示，当用户点击之后，再重新显示)
      */
-    public void searchSong(String substr) {
+    public void searchSong(String subStr) {
 
         MusicNode node = FirstMusic;
         int count = 1;//从列表第一首歌开始搜索
@@ -194,7 +200,7 @@ import java.io.Serializable;
         while (count <= sum){
             str =  node.music.getSongName() + node.music.getArtist() + node.music.getAlbum();
             //P.S.待搜索的子串需要去掉前导空白
-            if (Implements.KMP(str,substr.trim())){
+            if (Implements.KMP(str,subStr.trim())){
                 //此时匹配，应当调用GUI将被匹配到的MusicNode显示出来
                 if (count == 1) flag = false; //只会对flag访问一次
 

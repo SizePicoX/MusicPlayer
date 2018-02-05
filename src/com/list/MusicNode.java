@@ -14,9 +14,10 @@ public class MusicNode {
 
 
     /**
+     * 仅在向音乐列表添加乐曲时被调用
      * @param music 通过给定的Music，构造它的节点
      */
-    MusicNode(Music music){
+     public MusicNode(Music music){
         this.music = music;
         next = null;
         prior = null;

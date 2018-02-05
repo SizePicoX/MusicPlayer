@@ -26,6 +26,13 @@ public class CurrentMusicList implements Serializable,PlayMode {
      */
     private  int currentPlayMode;
 
+
+    /**
+     * 内存中唯一的CurrentMusicList
+     */
+    private static transient CurrentMusicList currentMusicList;
+
+
 /*--------------------------------------------------------------------------------------------------------------
         //以下是用于实现随机播放的字段
 --------------------------------------------------------------------------------------------------------------*/
@@ -62,11 +69,11 @@ public class CurrentMusicList implements Serializable,PlayMode {
 
 
       /**
-     * 保证前20次产生随机播放时播放不同的乐曲（这要求乐曲列表里至少有21首歌）
-     * 如果乐曲列表里没有21首歌，那么就保证前 sum - 1 次随机播放时播放不同的歌
+     * 保证前10次产生随机播放时播放不同的乐曲（这要求乐曲列表里至少有11首歌）
+     * 如果乐曲列表里没有11首歌，那么就保证前 sum - 1 次随机播放时播放不同的歌
      * E.G.当乐曲总共只有9首时，随机播放的前8首歌将互不相同，且都与根节点乐曲不同
      */
-    private transient int maxCall = MusicList.getMusicList().getSum() < 21 ? MusicList.getMusicList().getSum() - 1 : 20;
+    private transient int maxCall = MusicList.getMusicList().getSum() < 11 ? MusicList.getMusicList().getSum() - 1 : 10;
 
 
     /*--------------------------------------------------------------------------------------------------------------
@@ -74,10 +81,6 @@ public class CurrentMusicList implements Serializable,PlayMode {
     --------------------------------------------------------------------------------------------------------------*/
 
 
-    /**
-     * 内存中唯一的CurrentMusicList
-     */
-    private static transient CurrentMusicList currentMusicList;
 
 
     /**
@@ -108,9 +111,12 @@ public class CurrentMusicList implements Serializable,PlayMode {
     /**
      * 当列表中没有任何歌曲时将会调用
      */
-    public void init(){
-        currentMusicNode = null;
-        currentPlayMode = 1;
+    public static void init(){
+        currentMusicList = new CurrentMusicList();
+        //初始化的当前播放乐曲为空，因为此时用户还没有选择播放的乐曲
+        currentMusicList.currentMusicNode = null;
+        //初始化的播放模式为顺序播放
+        currentMusicList.currentPlayMode = Mode_Sequential;
     }
 
 
@@ -252,7 +258,7 @@ public class CurrentMusicList implements Serializable,PlayMode {
                             if (offset > 0){
                                 //将指针指向当前指针加上偏移量之后的新的位置
                                 while (cnt != offset){
-                                    node = currentMusicNode.next;
+                                    node = node.next;
                                     ++cnt;
                                 }
                             }
@@ -261,7 +267,7 @@ public class CurrentMusicList implements Serializable,PlayMode {
                                 offset = offset * (-1);
                                 //将指针指向当前指针加上偏移量之后的新的位置
                                 while (cnt != offset){
-                                    node = currentMusicNode.prior;
+                                    node = node.prior;
                                     ++cnt;
                                 }
                             }
@@ -278,7 +284,7 @@ public class CurrentMusicList implements Serializable,PlayMode {
                         if (offset > 0){
                             //将指针指向当前指针加上偏移量之后的新的位置
                             while (cnt != offset){
-                                node = currentMusicNode.next;
+                                node = node.next;
                                 ++cnt;
                             }
                         }
@@ -287,7 +293,7 @@ public class CurrentMusicList implements Serializable,PlayMode {
                             offset = offset * (-1);
                             //将指针指向当前指针加上偏移量之后的新的位置
                             while (cnt != offset){
-                                node = currentMusicNode.prior;
+                                node = node.prior;
                                 ++cnt;
                             }
                         }
@@ -390,7 +396,7 @@ public class CurrentMusicList implements Serializable,PlayMode {
                             if (offset > 0){
                                 //将指针指向当前指针加上偏移量之后的新的位置
                                 while (cnt != offset){
-                                    node = currentMusicNode.next;
+                                    node = node.next;
                                     ++cnt;
                                 }
                             }
@@ -399,7 +405,7 @@ public class CurrentMusicList implements Serializable,PlayMode {
                                 //将指针指向当前指针加上偏移量之后的新的位置
                                 offset = offset * (-1);
                                 while (cnt != offset){
-                                    node = currentMusicNode.prior;
+                                    node = node.prior;
                                     ++cnt;
                                 }
                             }
@@ -416,7 +422,7 @@ public class CurrentMusicList implements Serializable,PlayMode {
                         if (offset > 0){
                             //将指针指向当前指针加上偏移量之后的新的位置
                             while (cnt != offset){
-                                node = currentMusicNode.next;
+                                node = node.next;
                                 ++cnt;
                             }
                         }
@@ -425,7 +431,7 @@ public class CurrentMusicList implements Serializable,PlayMode {
                             //将指针指向当前指针加上偏移量之后的新的位置
                             offset = offset * (-1);
                             while (cnt != offset){
-                                node = currentMusicNode.prior;
+                                node = node.prior;
                                 ++cnt;
                             }
                         }

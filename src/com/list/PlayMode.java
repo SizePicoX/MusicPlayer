@@ -10,7 +10,7 @@ public interface PlayMode {
     int Mode_Sequential = 1;
 
     /* 随机播放，该模式下每次点击下一首或者上一首就生成一个随机数作为偏移量并且记录下来，然后在运行期间不变 */
-        int Mode_Random = 2;
+    int Mode_Random = 2;
 
     /*
     单曲循环,该模式下也不需要生成额外的播放列表,用户点击下一首按钮返回的就是MusicList中的下一首歌,
