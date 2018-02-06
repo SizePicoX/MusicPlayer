@@ -1,35 +1,42 @@
 package com.list;
 
 import Implements.Implements;
-import com.Music.Music;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 
-
 /*--------------------------------------------------------------------------------------------------------------
-使用循环双链表来存储Music，
-1.方便增加删除，可无限存储而不用动态申请内存
-2.便于排序
-缺点：1.但是没有随机访问的能力，而这种能力在随机播放和搜索的时候是必要的
-     2.目前尚不明确，假如说关闭了播放器之后，MusicNode指向的Music是否会消失
-我需要的随机访问能力：
-无论当前指针指向哪里，重新给定一个新的位置，要求当前指针要能够以O(1)或者接近O(1)的访问速度抵达新的位置
+        注意：链表时必须放在内存中的，绝对不该使用指针来遍历文件目录以达到播放的目的，那样会非常慢
 --------------------------------------------------------------------------------------------------------------*/
 
 /**
- * 显示在音乐列表控件里面
+ * 被MusicPlayer所管理的音乐列表
  * 任何时候内存中只允许有一个MusicList对象
  * 序列化的存储在文件中，方便下次重新打开播放器时显示在控件里面
  */
  public class MusicList implements Serializable{
 
-    private  int sum;//歌曲总数
-    private  MusicNode FirstMusic;//当前列表第一首乐曲,一开始为空
-    private  MusicNode LastMusic;//列表最后一首歌,用于使双链表循环化
+    /**
+     * 歌曲总数
+     */
+    private  int sum;
 
-    //内存中唯一的tMusicList
-    private static transient MusicList musicList;
+    /**
+     * 当前列表第一首乐曲,一开始为空
+     */
+    private  MusicNode FirstMusic;
 
+    /**
+     * 列表最后一首歌,用于使双链表循环化
+     */
+    private  MusicNode LastMusic;
+
+
+    /*--------------------------------------------------------------------------------------------------------------
+      构造函数,不允许自建MusicList
+    --------------------------------------------------------------------------------------------------------------*/
 
     /**
      * 不允许自建MusicList
@@ -37,35 +44,9 @@ import java.io.Serializable;
     private MusicList(){
     }
 
-    /**
-     * @param musicList 解序列化时得到的MusicList对象，
-     *                  每次播放器重启时都应当调用
-     */
-    public static void setMusicList(MusicList musicList){
-        MusicList.musicList = musicList;
-    }
-
-
-
-    /**
-     * @return 获取唯一的MusicList对象
-     */
-    public static MusicList getMusicList(){
-        return musicList;
-    }
-
-
-    /**
-     * 当列表中没有任何歌曲时将会调用
-     */
-    public static void init(){
-        musicList = new MusicList();
-        //初始化当前列表
-        musicList.sum = 0;
-        musicList.FirstMusic = null;
-        musicList.LastMusic = null;
-    }
-
+    /*--------------------------------------------------------------------------------------------------------------
+      MusicList的get方法
+    --------------------------------------------------------------------------------------------------------------*/
 
     /**
      * @return 返回列表中乐曲总数
@@ -91,13 +72,37 @@ import java.io.Serializable;
 
 
     /*--------------------------------------------------------------------------------------------------------------
-    下面是增添删除查找方法
+     初始化MusicList方法
     --------------------------------------------------------------------------------------------------------------*/
 
+
+    /**
+     * 解序列化方法,用于初始化MusicList对象
+     * 启动播放器时才需要解序列化
+     * 整个程序运行期间只需要调用一次
+     * @return MusicList
+     */
+    public static MusicList Init(){
+        /* 取出MusicList */
+        try {
+            FileInputStream fs = new FileInputStream("InitOfMusicList.ser");
+            ObjectInputStream os = new ObjectInputStream(fs);
+            os.close();
+
+            /* 采用readUnshared读取不断在改变的对象 */
+            return (MusicList)os.readUnshared();
+        }catch (ClassNotFoundException ex){
+            /* 当文件为空时 */
+            return new MusicList();
+        }catch (IOException ex){
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+
     /*--------------------------------------------------------------------------------------------------------------
-    失败的话让addSong方法抛出异常即可
-    不断调用addSong方法就能得到一张关于Music的链表
-    仅要修改链表即可，显示是GUI做的事情
+    下面是增添删除查找方法
     --------------------------------------------------------------------------------------------------------------*/
 
 
@@ -117,7 +122,7 @@ import java.io.Serializable;
             FirstMusic = newNode;
             ++sum;//歌曲总数加1
             //保存
-            Implements.Serialize(musicList);
+            Implements.Serialize(this);
         }
         //列表为空时
         else {
@@ -128,16 +133,11 @@ import java.io.Serializable;
             FirstMusic.prior = LastMusic;
             ++sum;//歌曲总数加1
             //保存
-            Implements.Serialize(musicList);
+            Implements.Serialize(this);
         }
     }
 
 
-
-    /*--------------------------------------------------------------------------------------------------------------
-    失败的话让deleteSong方法抛出异常即可
-    仅要修改链表即可，显示是GUI做的事情
-    --------------------------------------------------------------------------------------------------------------*/
     /**
      * @param selectedNode 用于从歌曲链表中删除选定的歌曲
      */
@@ -181,9 +181,8 @@ import java.io.Serializable;
         //歌曲总数减1
         --sum;
         //保存
-        Implements.Serialize(musicList);
+        Implements.Serialize(this);
     }
-
 
 
     /**

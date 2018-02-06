@@ -1,12 +1,10 @@
 package Implements;
 
 
-import com.Music.Music;
-import com.list.CurrentMusicList;
+import com.MusicPlayer;
 import com.list.MusicList;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -55,15 +53,15 @@ public class Implements {
 
 
     /**
-     * @param currentMusicList 被序列化的CurrentMusicList对象
+     * @param musicPlayer 被序列化的CurrentMusicList对象
      *               序列化存储的对象将被保存在 InitOfCurrentMusicList.ser 内
      */
-    public static void Serialize(CurrentMusicList currentMusicList){
+    public static void Serialize(MusicPlayer musicPlayer){
         try {
             FileOutputStream fs = new FileOutputStream("InitOfCurrentMusicList.ser");
             ObjectOutputStream os = new ObjectOutputStream(fs);
             /* 采用writeUnshared能重复写入同一个不断改变的对象 */
-            os.writeUnshared(currentMusicList);
+            os.writeUnshared(musicPlayer);
             os.close();
         }catch (Exception ex){
             ex.printStackTrace();
@@ -83,45 +81,6 @@ public class Implements {
             os.writeUnshared(musicList);
             os.close();
         }catch (Exception ex){
-            ex.printStackTrace();
-        }
-    }
-
-
-    /**
-     * 解序列化方法
-     * 启动播放器时才需要解序列化
-     * 整个程序运行期间只需要调用一次
-     * CurrentMusicList 放在InitOfCurrentMusicList.ser中
-     * MusicList 放在InitOfMusicList.ser中
-     */
-    public static void DeSerialize(){
-
-        /* 取出CurrentMusicList */
-        try {
-            FileInputStream fs = new FileInputStream("InitOfCurrentMusicList.ser");
-            ObjectInputStream os = new ObjectInputStream(fs);
-            /* 采用readUnshared读取不断在改变的对象 */
-            CurrentMusicList.setCurrentMusicList((CurrentMusicList)os.readUnshared());
-            os.close();
-        }catch ( ClassNotFoundException ex){
-            //当文件为空时
-            CurrentMusicList.init();
-        }catch (IOException ex){
-            ex.printStackTrace();
-        }
-
-        /* 取出MusicList */
-        try {
-            FileInputStream fs = new FileInputStream("InitOfMusicList.ser");
-            ObjectInputStream os = new ObjectInputStream(fs);
-            /* 采用readUnshared读取不断在改变的对象 */
-            MusicList.setMusicList((MusicList)os.readUnshared());
-            os.close();
-        }catch (ClassNotFoundException ex){
-            //当文件为空时
-            MusicList.init();
-        }catch (IOException ex){
             ex.printStackTrace();
         }
     }
@@ -153,6 +112,7 @@ public class Implements {
         //当子串不在主串内时，返回false
         return j == subStrArr.length;
     }
+
 
     /**
      * @param subStrArr 所查询的子字符串
