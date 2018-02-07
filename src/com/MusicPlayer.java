@@ -2,10 +2,9 @@ package com;
 
 
 import Implements.Implements;
-import com.Music.Music;
-import com.list.MusicList;
-import com.list.MusicNode;
-import com.list.PlayMode;
+import com.List.MusicList;
+import com.List.MusicNode;
+import com.List.PlayMode;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -25,9 +24,16 @@ public class MusicPlayer implements Serializable,PlayMode {
     --------------------------------------------------------------------------------------------------------------*/
 
     /**
-     * 当前正在播放的乐曲,退出播放器后再次启动，仍然播放这首歌(只不过是从头开始)
+     * 当前正在播放的乐曲,退出播放器后再次启动，仍然播放这首歌
+     * 由于currentMusicNode为引用类型，关闭播放器之后它所指向的值就没了，故它不应该序列化
      */
-    private MusicNode currentMusicNode;
+    private transient MusicNode currentMusicNode;
+
+    /**
+     * 记录下当前播放的乐曲是链表中第几个,以便下次初始化播放器时初始化currentMusicNode
+     * P.S.当且仅当退出播放器时才需要该变量
+     */
+    private int indexOfCurrentMusicNode;
 
     /**
      * 播放模式,退出播放器后再次启动，仍然以该模式播放
@@ -44,7 +50,7 @@ public class MusicPlayer implements Serializable,PlayMode {
     /**
      * 当前进度条的位置
      */
-    private int currentPlayTime;
+    private double currentPlayTime;
 
     /*--------------------------------------------------------------------------------------------------------------
             播放器所管理的播放列表
@@ -102,20 +108,14 @@ public class MusicPlayer implements Serializable,PlayMode {
     /*--------------------------------------------------------------------------------------------------------------
             构造函数，不允许自建MusicPlayer对象
     --------------------------------------------------------------------------------------------------------------*/
-
-
     /**
      * 不允许自建MusicPlayer对象
      */
     private MusicPlayer(){
     }
-
-
     /*--------------------------------------------------------------------------------------------------------------
             播放器的初始化方法
     --------------------------------------------------------------------------------------------------------------*/
-
-
     /**
      *解序列化方法,用于初始化音乐播放器
      * 启动播放器时才需要解序列化
@@ -142,29 +142,21 @@ public class MusicPlayer implements Serializable,PlayMode {
             return null;
         }
     }
-
-
     /*--------------------------------------------------------------------------------------------------------------
             播放器的get方法
     --------------------------------------------------------------------------------------------------------------*/
-
-
     /**
      * @return 当前正在播放的音乐
      */
     public  MusicNode getCurrentMusicNode() {
         return currentMusicNode;
     }
-
-
     /**
      * @return 当前播放模式
      */
     public  int getCurrentPlayMode(){
         return currentPlayMode;
     }
-
-
     /**
      * @return 当前播放器的音量
      *         P.S.启动播放器时，音量需要调用该方法以设置当前的播放音量
@@ -172,20 +164,16 @@ public class MusicPlayer implements Serializable,PlayMode {
     public int getVolume() {
         return volume;
     }
-
-
     /**
      * @return 获取当前这首歌的播放位置
      *         P.S.启动播放器时，进度条需要调用该方法以设定当前的播放进度
      */
-    public int getCurrentPlayTime() {
+    public double getCurrentPlayTime() {
         return currentPlayTime;
     }
-
     /*--------------------------------------------------------------------------------------------------------------
             播放器的set方法
     --------------------------------------------------------------------------------------------------------------*/
-
     /**
      * 设定播放器现在播放的乐曲,并立刻被序列化保存
      * 当使用随机播放时，必须将用户设定的MusicNode入栈
@@ -209,8 +197,6 @@ public class MusicPlayer implements Serializable,PlayMode {
         //如果并非随机播放，则只需要修改指针即可
         this.currentMusicNode = currentMusicNode;
     }
-
-
     /**
      * @param mode 选定的播放模式代码，仅允许0,1,2，
      *             分别对应 顺序，随机，单曲循环
@@ -224,8 +210,6 @@ public class MusicPlayer implements Serializable,PlayMode {
             default: //在这里报错
         }
     }
-
-
     /**
      * @param volume 设定的播放器的音量
      *               P.S.用以实现播放器音量控制
@@ -234,8 +218,6 @@ public class MusicPlayer implements Serializable,PlayMode {
         this.volume = volume;
         // TODO: 2018/2/7  这里调用GUI中的方法以调节声音大小
     }
-
-
     /**
      * @param currentPlayTime 设定当前这首歌的播放位置
      *                        P.S.用以实现进度条的控制
@@ -244,15 +226,9 @@ public class MusicPlayer implements Serializable,PlayMode {
         this.currentPlayTime = currentPlayTime;
         // TODO: 2018/2/7  这里调用GUI中的方法以调节进度条
     }
-
-
-
    /*--------------------------------------------------------------------------------------------------------------
    下面是各种播放模式的实现
    --------------------------------------------------------------------------------------------------------------*/
-
-
-
     /**
      * 以设定的currentPlayMode获取下一首歌
      * 用户按下“下一首”按钮或者本次播放结束后自动调用
@@ -387,8 +363,6 @@ public class MusicPlayer implements Serializable,PlayMode {
         }
         return null;
     }
-
-
     /**
      * 以选定的currentPlayMode获取上一首歌
      * 当且仅当用户按下“上一首”按钮才会调用
@@ -520,11 +494,29 @@ public class MusicPlayer implements Serializable,PlayMode {
         }
         return null;
     }
-
     /**
      * 调用线程中断使得播放暂停
      */
     public void stop(){
         // TODO: 2018/2/7  调用线程中断使得播放暂停
+    }
+    /**
+     * @return currentMusicNode在链表中是第几个元素
+     * 当返回 -1 时代表没用找到，正常情况下，此时要么是用户没有播放任何一首歌，要么就是音乐列表为空
+     * P.S.当且仅当推出播放器时才调用，以设定indexOfCurrentMusicNode
+     */
+    public int setIndexOfCurrentMusicNode() {
+        if (currentMusicNode != null && musicList.getSum() != 0){
+            //计数器，以记录currentMusicNode在链表中是第几个元素
+            int cnt = 1;
+            MusicNode node = musicList.getFirstMusic();
+            while (!currentMusicNode.equals(node)){
+                node = node.next;
+                ++cnt;
+            }
+            return cnt;
+        }
+        //此时代表没有找到，出现异常
+        return -1;
     }
 }

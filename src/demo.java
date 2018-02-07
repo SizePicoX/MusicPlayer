@@ -1,7 +1,5 @@
 import com.Music.Music;
-import com.MusicPlayer;
-import com.list.MusicList;
-import com.list.MusicNode;
+import com.List.MusicNode;
 
 import javax.swing.*;
 
@@ -38,10 +36,6 @@ public class demo {
             String mp3FilePath = fileChooser.getSelectedFile().getAbsolutePath();
 
 
-
-            //每次选择路径后都创建一个Music对象
-            music = new Music(mp3FilePath,Music.setMusicInfo(mp3FilePath));
-            node = new MusicNode(music);
 
 
 

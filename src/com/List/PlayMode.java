@@ -1,4 +1,4 @@
-package com.list;
+package com.List;
 
 /**
  * 可选的播放模式和随机播放时指针一次最多跳转的偏移量

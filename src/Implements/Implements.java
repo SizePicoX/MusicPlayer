@@ -2,7 +2,7 @@ package Implements;
 
 
 import com.MusicPlayer;
-import com.list.MusicList;
+import com.List.MusicList;
 
 import java.io.*;
 import java.util.Random;
@@ -67,8 +67,6 @@ public class Implements {
             ex.printStackTrace();
         }
     }
-
-
     /**
      * @param musicList 被序列化的MusicList对象
      *                  序列化存储的对象将被保存在 InitOfMusicList.ser 内

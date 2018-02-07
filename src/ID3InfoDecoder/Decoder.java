@@ -126,12 +126,12 @@ public class Decoder {
 
     /**
      * 解码器的核心，用于获取MP3文件的主要信息
-     * @return 返回一个长度为5的字符串数组，依次表示：
-     * 标志位，表示本次解码是否成功(但是getMusicInfo方法并不负责对标志位的管理)
+     * @return 返回一个长度为 5 的字符串数组，依次表示：
      * SongName(ID3标签为：TIT2),歌曲名
      * Artist(ID3标签为：TPE1),歌手
      * Album(ID3标签为：TALB),专辑
      * SongTime(ID3标签为：TIME),歌曲时长
+     * MP3文件路径
      */
     public String[] getMusicInfo() throws UnsupportedEncodingException {
         String[] MusicInfo = new String[5];
@@ -154,11 +154,11 @@ public class Decoder {
                 ++count;//每当自增1，说明得到了一个需要的值
                 switch (sign){
                     //标签帧为“歌曲名字”
-                    case 1:MusicInfo[1] = new String(buf,offset + 10 + 1,Frame.getSize() - 1,setEncoding(buf[offset + 10]));break;
+                    case 1:MusicInfo[0] = new String(buf,offset + 10 + 1,Frame.getSize() - 1,setEncoding(buf[offset + 10]));break;
                     //标签帧为“歌手”
-                    case 2:MusicInfo[2] = new String(buf,offset + 10 + 1,Frame.getSize() - 1,setEncoding(buf[offset + 10]));break;
+                    case 2:MusicInfo[1] = new String(buf,offset + 10 + 1,Frame.getSize() - 1,setEncoding(buf[offset + 10]));break;
                     //标签帧为“专辑”
-                    case 3:MusicInfo[3] = new String(buf,offset + 10 + 1,Frame.getSize() - 1,setEncoding(buf[offset + 10]));break;
+                    case 3:MusicInfo[2] = new String(buf,offset + 10 + 1,Frame.getSize() - 1,setEncoding(buf[offset + 10]));break;
                     /*--------------------------------------------------------------------------------------------------------------
 
                     --------------------------------------------------------------------------------------------------------------*/
@@ -172,7 +172,11 @@ public class Decoder {
         目前无法通过检索ID3标签的方式得到歌曲时长
         故通过引入的包中的类来实现
         */
-        MusicInfo[4] = getSongTime();
+        MusicInfo[3] = getSongTime();
+
+        //此时解码成功，
+        //MusicInfo的5号元素置为当前MP3文件路径
+        MusicInfo[4] = mp3FilePath;
         return MusicInfo;
     }
 

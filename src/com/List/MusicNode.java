@@ -1,13 +1,15 @@
-package com.list;
+package com.List;
 
 import com.Music.Music;
+
+import java.io.Serializable;
 
 /**
  * 存储Music对象的链表节点，是MusicList的最小单元
  *
  * 同时，MusicNode应当是整个软件范围内的，除了在添加乐曲时候的最小可操纵单元
  */
-public class MusicNode {
+public class MusicNode implements Serializable{
     public Music music;
     public MusicNode next;
     public MusicNode prior;

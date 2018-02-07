@@ -20,7 +20,7 @@ class LabelHeader {
      */
     private boolean isModify = false;
 
-    /**
+    /**初始化ID3标签头部
      * @param mp3FilePath
      * 用以获取MP3文件的ID3头部
      */
