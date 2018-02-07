@@ -121,8 +121,6 @@ import java.io.Serializable;
             //修改当前列表第一首歌曲
             FirstMusic = newNode;
             ++sum;//歌曲总数加1
-            //保存
-            Implements.Serialize(this);
         }
         //列表为空时
         else {
@@ -132,8 +130,6 @@ import java.io.Serializable;
             FirstMusic.next = LastMusic;
             FirstMusic.prior = LastMusic;
             ++sum;//歌曲总数加1
-            //保存
-            Implements.Serialize(this);
         }
     }
 
@@ -180,8 +176,6 @@ import java.io.Serializable;
         MusicNode.DeleteSelectedNode(selectedNode);
         //歌曲总数减1
         --sum;
-        //保存
-        Implements.Serialize(this);
     }
 
 

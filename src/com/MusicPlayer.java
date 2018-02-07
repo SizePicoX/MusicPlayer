@@ -208,8 +208,6 @@ public class MusicPlayer implements Serializable,PlayMode {
         }
         //如果并非随机播放，则只需要修改指针即可
         this.currentMusicNode = currentMusicNode;
-        //保存
-        Implements.Serialize(this);
     }
 
 
@@ -225,8 +223,6 @@ public class MusicPlayer implements Serializable,PlayMode {
             case Mode_Loop : currentPlayMode = Mode_Loop;break;
             default: //在这里报错
         }
-        //保存
-        Implements.Serialize(this);
     }
 
 
@@ -237,7 +233,6 @@ public class MusicPlayer implements Serializable,PlayMode {
     public void setVolume(int volume) {
         this.volume = volume;
         // TODO: 2018/2/7  这里调用GUI中的方法以调节声音大小
-        Implements.Serialize(this);
     }
 
 
@@ -248,7 +243,6 @@ public class MusicPlayer implements Serializable,PlayMode {
     public void setCurrentPlayTime(int currentPlayTime) {
         this.currentPlayTime = currentPlayTime;
         // TODO: 2018/2/7  这里调用GUI中的方法以调节进度条
-        Implements.Serialize(this);
     }
 
 
