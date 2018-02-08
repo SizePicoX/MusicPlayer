@@ -3,8 +3,9 @@ package com.List;
 import Implements.Implements;
 import Error.InitException;
 import Error.InitError;
+import com.MusicPlayer;
+
 import java.io.*;
-import java.util.ArrayList;
 
 /*--------------------------------------------------------------------------------------------------------------
         注意：链表时必须放在内存中的，绝对不该使用指针来遍历文件目录以达到播放的目的，那样会非常慢
@@ -37,10 +38,10 @@ import java.util.ArrayList;
     /**
      * 如果链表被修改，则置为true，反之，则为false
      */
-    private  boolean flag = false;
+    private  boolean isModify = false;
 
     /**
-     * 保存了当前乐曲列表的序列化文件。默认为 InitOfMusicList.ser
+     * 保存有乐曲播放列表的序列化文件的相对路径。
      */
     private String initFileName = null;
 
@@ -51,16 +52,20 @@ import java.util.ArrayList;
     /**
      * 该方法用于在启动播放器时从用户数据里恢复音乐播放列表
      * P.S.需要保证默认初始化仅使用一次,且输入进来的序列化文件是已经存在的
-     * @param initFileName 使用输入的已存在的序列化文件以初始化MusicList对象.
-     *                     为null时即代表创建的列表为默认列表,其使用的序列化文件名为InitOfMusicList.ser
+     * @param initFileName 使用输入的已存在的序列化文件的相对路径以初始化MusicList对象.
+     *                     为null时即代表创建的列表为默认列表,其使用的序列化文件名为FirstMusicList.ser
      *                     但默认初始化仅能使用一次
      */
     public MusicList(String initFileName){
-        /* 序列化文件默认为 InitOfMusicList.ser */
-        if (initFileName == null && ReferenceCount == 0){
-            initFileName = "InitOfMusicList.ser";
+        /* 序列化文件默认为 FirstMusicList.ser */
+        if ( (initFileName == null || initFileName.equals("FirstMusicList.ser")) && ReferenceCount == 0){
+            initFileName = "FirstMusicList.ser";
             /* 引用计数加1 */
             ++ReferenceCount;
+            /* 将默认播放列表添加到数组里面 */
+            MusicPlayer.TotalMusicList.add(0,this);
+            /* 将默认播放列表的相对路径添加到数组里面 */
+            MusicPlayer.TotalMusicListFileName.add(0,initFileName);
         }
         /* 否则就以输入的序列化文件名来初始化 */
         else this.initFileName = initFileName;
@@ -73,7 +78,7 @@ import java.util.ArrayList;
             /* 将输出给用户看的错误信息 */
             String errorMessage = ex.getMessage();
             switch (errorCode){
-                /* 初始化时，由于某种原因，文件的部分数据丢失，说明可能文件部分损坏 */
+                /* 初始化时，由于某种原因，文件的部分数据丢失，仅成功初始化了一部分,可能文件部分损坏 */
                 case InitError.Part_File_Unreadable :{
                     // TODO: 2018/2/8 使用GUI告诉用户文件部分损坏
                     break;
@@ -105,7 +110,7 @@ import java.util.ArrayList;
         // TODO: 2018/2/8 创建新列表时，应当不允许同名
         this.initFileName = initFileName;
         /* 创建即代表修改 */
-        flag = true;
+        isModify = true;
     }
     /*--------------------------------------------------------------------------------------------------------------
       MusicList的get方法
@@ -128,8 +133,20 @@ import java.util.ArrayList;
     public MusicNode getLastMusic() {
         return LastMusic;
     }
+
+    /**
+     * 调用该方法后，视为用户创建列表成功
+     * @return 该MusicList对应的链表的序列化文件的相对路径
+     */
+    public String getInitFileName() {
+        /* 将用户新建播放列表对应的链表的序列化文件的相对路径添加到数组 */
+        MusicPlayer.TotalMusicListFileName.add(MusicPlayer.sum,initFileName);
+        /* 将用户新建的MusicList对象添加到数组,并且列表总数加1 */
+        MusicPlayer.TotalMusicList.add(MusicPlayer.sum++,this);
+        return initFileName;
+    }
     /*--------------------------------------------------------------------------------------------------------------
-     初始化MusicList方法
+     初始化和保存MusicList对象方法
     --------------------------------------------------------------------------------------------------------------*/
     /**
      * 初始化方法,使用用户数据来初始化MusicList以构造链表
@@ -139,34 +156,22 @@ import java.util.ArrayList;
      *                     P.S.我们应当保证输入进来的文件名指向已经创建了的的播放列表
      */
     private void Init(String initFileName){
-        /* 暂存从流中读取出来的MusicNode */
-        ArrayList<MusicNode> buf = new ArrayList<>(100);
         /* 初始化内存中的链表 */
         try {
             /* 打开流文件 */
             FileInputStream fs = new FileInputStream(initFileName);
             ObjectInputStream os = new ObjectInputStream(fs);
-            /*
-            从流文件中读取数据，暂存到缓冲区内
-            P.S.这是因为，直接读取会导致链表第一首歌变成最后一首，最后一首变成第一首，且指针的指向全乱掉了
-            */
+            /* 从流中读取第一歌节点 */
+            FirstMusic = (MusicNode)os.readObject();
+            /* 乐曲总数加1 */
+            ++sum;
+            /* 取出链表最后一个节点,并得到乐曲总数 */
             while (fs.available() > 0){
-                buf.add((MusicNode) os.readObject());
-                /*--------------------------------------------------------------------------------------------------------------
-                // TODO: 2018/2/8/008
-                1.以及，从流中读取出来的MusicNode对象中的Music对象，实际上并没有值在里面，是否去实现深拷贝？
-                --------------------------------------------------------------------------------------------------------------*/
+                LastMusic = (MusicNode)os.readObject();
+                ++sum;
             }
             /* 关闭流 */
             os.close();
-            /* 初始化播放列表 */
-            int i = buf.size();
-            while (i > 0){
-                --i;
-                addSong(buf.get(i));
-            }
-            /* 由于调用addSong方法会将flag置为true,故应当在初始化完成之后，将flag置为false */
-            flag = false;
         }
         /* 给定的序列化文件正常读取但里面没有数据时 */
         /* P.S.抛出该错误时，大概率时因为用户没有添加乐曲进入列表,故此时什么都不做 */
@@ -176,15 +181,7 @@ import java.util.ArrayList;
         /* 此时读取流文件时候出错,那么已经读取了多少个MusicNode对象就往链表里插入多少个，然后报错 */
         catch (IOException ex){
             /* 当输入流抛出异常前已经读取了一部分MusicNode对象出来时 */
-            int i = buf.size();
-            if (i != 0){
-                while (i > 0){
-                    --i;
-                    addSong(buf.get(i));
-                }
-                /* 由于调用addSong方法会将flag置为true,故应当在初始化完成之后，将flag置为false */
-                flag = false;
-                /* 抛出异常 */
+            if (sum != 0){
                 throw  new InitException("仅有一部分的数据被正常读取，其他的读取失败.",InitError.Part_File_Unreadable);
             }
             /* 此时整个文件都无法读取 */
@@ -192,11 +189,11 @@ import java.util.ArrayList;
         }
     }
     /**
-     * 保存音乐播放列表
+     * 保存MusicList对象所管理的乐曲链表
      */
-    public void save(){
+    public void Save(){
         /*如果链表被修改才需要保存*/
-        if (flag){
+        if (isModify){
             int i = 0;
             MusicNode node = FirstMusic;
             try {
@@ -204,7 +201,11 @@ import java.util.ArrayList;
                 ObjectOutputStream os = new ObjectOutputStream(fs);
                 /* 先将上一次的序列化文件清空 */
                 os.writeObject(null);
-                /* 再将本次的数据写入序列化文件 */
+                /* 将这张链表全部写入序列化文件 */
+                /*
+                在序列化存储的时候，必须将整个链表遍历.因为如果不这样，读取的时候就只能读取处一个MusicNode对象
+                虽然讲仍然可以通过这个对象的指针访问整个链表，但这样在初始化的时候就没法找到LastMusic节点了
+                */
                 while (i < sum){
                     os.writeObject(node);
                     node = node.next;
@@ -244,12 +245,15 @@ import java.util.ArrayList;
             ++sum;//歌曲总数加1
         }
         //只要调用了该方法，则视为音乐链表已经被修改
-        flag = true;
+        isModify = true;
     }
+
     /**
      * @param selectedNode 用于从歌曲链表中删除选定的歌曲
+     * @param isDeleteOrNot 为true时，表示连同选定的歌曲的源文件也给删除
+     * @return 当且仅当删除源文件失败时才返回false.节点的删除不可能失败
      */
-    public void deleteSong(MusicNode selectedNode){
+    public boolean deleteSong(MusicNode selectedNode,boolean isDeleteOrNot){
         //当选定的节点不是第一首乐曲也不是最后一首时
         if (selectedNode != FirstMusic && selectedNode != LastMusic){
             //修改指针
@@ -283,13 +287,20 @@ import java.util.ArrayList;
             LastMusic.next = FirstMusic;
             FirstMusic.prior = LastMusic;
         }
-
+        boolean result = true;
+        //如果用户选择删除源文件时
+        if (isDeleteOrNot){
+            File file = new File(selectedNode.music.getMp3FilePath());
+            result = file.delete();
+        }
         //释放指针
         MusicNode.DeleteSelectedNode(selectedNode);
         //歌曲总数减1
         --sum;
         //只要调用了该方法，则视为音乐链表已经被修改
-        flag = true;
+        isModify = true;
+        //当删除源文件失败时，才返回false.链表的删除不可能失败
+        return result;
     }
     /**
      * @param subStr 待搜索的字符串，可以是歌曲名字或歌手或专辑中的任意连续字符

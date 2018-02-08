@@ -18,7 +18,6 @@ public class Implements {
      * 不允许其他类创建该工具类的对象
      */
     private Implements(){}
-
     /**
      * @param SingedNum 输入一个待转换的有符号数，必须时字节型变量
      * @return 输出该字节对应的无符号数，例如，输入-77，输出179
@@ -29,10 +28,6 @@ public class Implements {
                 (SingedNum & 0X08) + (SingedNum & 0X04) + (SingedNum & 0X02) + (SingedNum & 0X01);
         return sum;
     }
-
-
-
-
     /**
      * @param max 想要获取的随机数的最大值
      * @return 返回的随机数的绝对值，在1到max之间
@@ -49,41 +44,6 @@ public class Implements {
         if (flag) return result;
         return (-1) * result;
     }
-
-
-
-    /**
-     * @param musicPlayer 被序列化的CurrentMusicList对象
-     *               序列化存储的对象将被保存在 InitOfCurrentMusicList.ser 内
-     */
-    public static void Serialize(MusicPlayer musicPlayer){
-        try {
-            FileOutputStream fs = new FileOutputStream("InitOfCurrentMusicList.ser");
-            ObjectOutputStream os = new ObjectOutputStream(fs);
-            /* 采用writeUnshared能重复写入同一个不断改变的对象 */
-            os.writeUnshared(musicPlayer);
-            os.close();
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-    }
-    /**
-     * @param musicList 被序列化的MusicList对象
-     *                  序列化存储的对象将被保存在 InitOfMusicList.ser 内
-     */
-    public static void Serialize(MusicList musicList){
-        try {
-            FileOutputStream fs = new FileOutputStream("InitOfMusicList.ser");
-            ObjectOutputStream os = new ObjectOutputStream(fs);
-            /* 采用writeUnshared能重复写入同一个不断改变的对象 */
-            os.writeUnshared(musicList);
-            os.close();
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-    }
-
-
     /**
      * @param str 被搜索的主串
      * @param subStr 希望查找的子串
@@ -110,8 +70,6 @@ public class Implements {
         //当子串不在主串内时，返回false
         return j == subStrArr.length;
     }
-
-
     /**
      * @param subStrArr 所查询的子字符串
      * @param Next 输出的Next数组

@@ -6,10 +6,7 @@ import com.List.MusicList;
 import com.List.MusicNode;
 import com.List.PlayMode;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.util.ArrayList;
 
 /**
@@ -24,16 +21,21 @@ public class MusicPlayer implements Serializable,PlayMode {
     --------------------------------------------------------------------------------------------------------------*/
 
     /**
-     * 当前正在播放的乐曲,退出播放器后再次启动，仍然播放这首歌
-     * 由于currentMusicNode为引用类型，关闭播放器之后它所指向的值就没了，故它不应该序列化
+     * 当前播放列表在数组中的位置.这是真正被保存到ini文件里的字段
      */
-    private static  MusicNode currentMusicNode;
+    private static int indexOfCurrentMusicList;
 
     /**
      * 记录下当前播放的乐曲是链表中第几个,以便下次初始化播放器时初始化currentMusicNode
      * P.S.当且仅当退出播放器时才需要该变量
      */
     private static int indexOfCurrentMusicNode;
+
+    /**
+     * 当前正在播放的乐曲,退出播放器后再次启动，仍然播放这首歌
+     * P.S.(该字段并不保存到ini文件里)
+     */
+    private static  MusicNode currentMusicNode;
 
     /**
      * 播放模式,退出播放器后再次启动，仍然以该模式播放
@@ -52,13 +54,28 @@ public class MusicPlayer implements Serializable,PlayMode {
      */
     private static double currentPlayTime;
 
-    /*--------------------------------------------------------------------------------------------------------------
-            播放器所管理的播放列表
-    --------------------------------------------------------------------------------------------------------------*/
+
     /**
-     * 播放器所管理的播放列表
+     * 播放器正在播放的当前播放列表(该字段并不保存到ini文件里)
      */
-    private static MusicList musicList;
+    private static MusicList currentMusicList;
+
+    /**
+     * 播放器管理的所有播放列表(该字段并不保存到ini文件)
+     * P.S.第一个元素为播放器默认播放列表，其他为用户自建的播放列表.
+     */
+    public static ArrayList<MusicList> TotalMusicList = new ArrayList<>();
+
+    /**
+     * 所有MusicList对应的链表的序列化文件的相对路径,这是真正保存到ini文件里的字段
+     * P.S.播放器开始时，使用该数组以初始化TotalMusicList.
+     */
+    public static ArrayList<String> TotalMusicListFileName = new ArrayList<>();
+
+    /**
+     * 乐曲列表总数
+     */
+    public static int sum = 1;
 /*--------------------------------------------------------------------------------------------------------------
         //以下是用于实现随机播放的字段
 --------------------------------------------------------------------------------------------------------------*/
@@ -99,7 +116,7 @@ public class MusicPlayer implements Serializable,PlayMode {
      * 如果乐曲列表里没有11首歌，那么就保证前 sum - 1 次随机播放时播放不同的歌
      * E.G.当乐曲总共只有9首时，随机播放的前8首歌将互不相同，且都与根节点乐曲不同
      */
-    private static int maxCall = musicList.getSum() < 11 ? musicList.getSum() - 1 : 10;
+    private static int maxCall = currentMusicList.getSum() < 11 ? currentMusicList.getSum() - 1 : 10;
 
 
     /*--------------------------------------------------------------------------------------------------------------
@@ -111,7 +128,7 @@ public class MusicPlayer implements Serializable,PlayMode {
     private MusicPlayer(){
     }
     /*--------------------------------------------------------------------------------------------------------------
-            播放器的初始化方法
+            播放器的初始化和保存方法
     --------------------------------------------------------------------------------------------------------------*/
     /*--------------------------------------------------------------------------------------------------------------
      // TODO: 2018/2/8 重写初始化方法和保存方法 以及考察 setIndexOfCurrentMusicNode 方法
@@ -119,38 +136,33 @@ public class MusicPlayer implements Serializable,PlayMode {
      // TODO: 2018/2/8  !!!!!!!!!!!!!!!!!
     --------------------------------------------------------------------------------------------------------------*/
     /**
-     *解序列化方法,用于初始化音乐播放器
-     * 启动播放器时才需要解序列化
+     * 初始化方法
      * 整个程序运行期间只需要调用一次
-     * @param currentMusicList 音乐播放器所管理的音乐列表
-     * @return 解序列化得到的MusicPlayer对象
      */
-    public static MusicPlayer Init(MusicList currentMusicList){
-        // TODO: 2018/2/8 由于全部都是静态字段，故需要重写初始化方法
-        /* 初始化指向音乐播放列表的指针 */
-        musicList = currentMusicList;
-
-        /* 取出CurrentMusicList */
-        try {
-            FileInputStream fs = new FileInputStream("InitOfMusicPlayer.ser");
-            ObjectInputStream os = new ObjectInputStream(fs);
-            os.close();
-            /* 采用readUnshared读取不断在改变的对象 */
-            return  (MusicPlayer)os.readUnshared();
-        }catch ( ClassNotFoundException ex){
-            /* 当文件为空时 */
-            return  new MusicPlayer();
-        }catch (IOException ex){
-            ex.printStackTrace();
-            return null;
-        }
+    public static void Init(){
+        // TODO: 2018/2/8 从ini文件中读取数据并将对应键值写入对应字段
     }
-
     /**
      * 播放器的保存方法
+     * 当且仅当关闭播放器时调用
+     * 用户数据将被保存到config.ini文件里面
      */
-    public static void save(){
-        // TODO: 2018/2/8  怎么写播放器的保存方法呢？
+    public static void Save(){
+        int i = 0;
+        while (i < TotalMusicList.size()){
+            /* 保存所有MusicList所对应的乐曲链表 */
+            TotalMusicList.get(i).Save();
+            ++i;
+        }
+        /* 再保存音乐播放器的设置 */
+        try {
+            FileWriter writer = new FileWriter("config.ini");
+            // TODO: 2018/2/8 修改ini文件中的对应键值
+            // TODO: 2018/2/8 使用正则表达式
+            //将 TotalMusicListFileName 中的每个元素保存
+        }catch (IOException ex){
+            ex.printStackTrace();
+        }
     }
     /*--------------------------------------------------------------------------------------------------------------
             播放器的get方法
@@ -296,7 +308,7 @@ public class MusicPlayer implements Serializable,PlayMode {
                         //如果生成的MusicNode在nextMusic里面，则继续循环直到随机到一个不在序列内的
                         while (nextMusic.indexOf(node) != -1){
                             //生成偏移量
-                            offset = Implements.GetRandomNum(musicList.getSum());
+                            offset = Implements.GetRandomNum(currentMusicList.getSum());
                             //计数器
                             int cnt = 1;
 
@@ -322,7 +334,7 @@ public class MusicPlayer implements Serializable,PlayMode {
                     //调用次数超过maxCall次时，则不同的调用可能输出相同的MusicNode
                     else {
                         //生成偏移量
-                        offset = Implements.GetRandomNum(musicList.getSum());
+                        offset = Implements.GetRandomNum(currentMusicList.getSum());
                         //计数器
                         int cnt = 1;
 
@@ -432,7 +444,7 @@ public class MusicPlayer implements Serializable,PlayMode {
                         //如果生成的MusicNode在priorMusic里面已经存在，则继续循环直到随机到一个不在序列内的
                         while (priorMusic.indexOf(node) != -1){
                             //生成偏移量
-                            offset = Implements.GetRandomNum(musicList.getSum());
+                            offset = Implements.GetRandomNum(currentMusicList.getSum());
                             //计数器
                             int cnt = 1;
 
@@ -458,7 +470,7 @@ public class MusicPlayer implements Serializable,PlayMode {
                     //调用次数超过maxCall次时，则不同的调用可能输出相同的MusicNode
                     else {
                         //生成偏移量
-                        offset = Implements.GetRandomNum(musicList.getSum());
+                        offset = Implements.GetRandomNum(currentMusicList.getSum());
                         //计数器
                         int cnt = 1;
 
@@ -516,10 +528,10 @@ public class MusicPlayer implements Serializable,PlayMode {
      * P.S.当且仅当推出播放器时才调用，以设定indexOfCurrentMusicNode
      */
     public static int setIndexOfCurrentMusicNode() {
-        if (currentMusicNode != null && musicList.getSum() != 0){
+        if (currentMusicNode != null && currentMusicList.getSum() != 0){
             //计数器，以记录currentMusicNode在链表中是第几个元素
             int cnt = 1;
-            MusicNode node = musicList.getFirstMusic();
+            MusicNode node = currentMusicList.getFirstMusic();
             while (!currentMusicNode.equals(node)){
                 node = node.next;
                 ++cnt;
@@ -528,5 +540,13 @@ public class MusicPlayer implements Serializable,PlayMode {
         }
         //此时代表没有找到，出现异常
         return -1;
+    }
+    /**
+     * 删除选定的音乐播放列表
+     * P.S.无法删除默认列表
+     * @param IndexOfSelectedList 选定的将要被删除的节点的下标
+     * @param flag 为true时，表示将该列表里的乐曲源文件也给删除
+     */
+    public static void deleteMusicList(int IndexOfSelectedList,boolean flag){
     }
 }
