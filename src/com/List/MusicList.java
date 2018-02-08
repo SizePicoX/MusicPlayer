@@ -1,8 +1,9 @@
 package com.List;
 
 import Implements.Implements;
-
+import Error.InitException;
 import java.io.*;
+import java.util.ArrayList;
 
 /*--------------------------------------------------------------------------------------------------------------
         注意：链表时必须放在内存中的，绝对不该使用指针来遍历文件目录以达到播放的目的，那样会非常慢
@@ -10,7 +11,7 @@ import java.io.*;
 
 /**
  * 被MusicPlayer所管理的音乐列表
- * 任何时候内存中只允许有一个MusicList对象
+ * 可以创建多个乐曲列表，即MusicList可以有多个实例
  * 序列化的存储在文件中，方便下次重新打开播放器时显示在控件里面
  */
  public class MusicList implements Serializable{
@@ -18,33 +19,54 @@ import java.io.*;
     /**
      * 歌曲总数
      */
-    private static int sum = 0;
+    private  int sum = 0;
 
     /**
      * 当前列表第一首乐曲,一开始为空
      * P.S.由于FirstMusic是引用类型，关闭播放器之后它所指向的值就没了，故它不应该序列化
      */
-    private static MusicNode FirstMusic = null;
+    private  MusicNode FirstMusic = null;
 
     /**
      * 列表最后一首歌,用于使双链表循环化
      * P.S.由于LastMusic是引用类型，关闭播放器之后它所指向的值就没了，故它不应该序列化
      */
-    private static MusicNode LastMusic = null;
-
+    private  MusicNode LastMusic = null;
 
     /**
      * 如果链表被修改，则置为true，反之，则为false
      */
-    private static boolean flag = false;
+    private  boolean flag = false;
 
-    /*--------------------------------------------------------------------------------------------------------------
-      构造函数,不允许自建MusicList
-    --------------------------------------------------------------------------------------------------------------*/
     /**
-     * 不允许自建MusicList
+     * 保存了当前乐曲列表的序列化文件。默认为 InitOfMusicList.ser
      */
-    private MusicList(){
+    private String initFileName;
+
+    /**
+     * 引用计数器.播放器只有一个默认播放列表，故使用引用计数来保证默认初始化仅能使用一次
+     */
+    private static int ReferenceCount = 0;
+    /**
+     * @param initFileName 使用该序列化文件以初始化MusicList对象.
+     *                     为null时即代表创建的列表为默认列表,其使用的序列化文件名为InitOfMusicList.ser
+     *                     但默认初始化仅能使用一次
+     */
+    public MusicList(String initFileName){
+        /* 序列化文件默认为 InitOfMusicList.ser */
+        if (initFileName == null && ReferenceCount == 0){
+            initFileName = "InitOfMusicList.ser";
+            /* 引用计数加1 */
+            ++ReferenceCount;
+        }
+        /* 当连续使用两次默认初始化时，抛出错误 */
+        else if (initFileName == null && ReferenceCount == 1){
+            throw new InitException("不允许连续两次默认初始化！！！");
+        }
+        /* 否则就以输入的序列化文件名来初始化 */
+        else this.initFileName = initFileName;
+        /* 初始化 */
+        Init(initFileName);
     }
     /*--------------------------------------------------------------------------------------------------------------
       MusicList的get方法
@@ -75,25 +97,32 @@ import java.io.*;
      * 启动播放器时才需要解序列化
      * 整个程序运行期间只需要调用一次
      */
-    public static void Init(){
+    private void Init(String initFileName){
         /* 初始化内存中的链表 */
         try {
             /* 暂存从流中读取出来的MusicNode */
-            MusicNode node;
+            ArrayList<MusicNode> buf = new ArrayList<>(100);
             /* 打开流文件 */
-            FileInputStream fs = new FileInputStream("InitOfMusicList.ser");
+            FileInputStream fs = new FileInputStream(initFileName);
             ObjectInputStream os = new ObjectInputStream(fs);
+            /*
+            从流文件中读取数据，暂存到缓冲区内
+            P.S.这是因为，直接读取会导致链表第一首歌变成最后一首，最后一首变成第一首，且指针的指向全乱掉了
+            */
             while (fs.available() > 0){
-                node = (MusicNode) os.readObject();
-                /* addSong方法会自动递增sum乐曲总数 */
+                buf.add((MusicNode) os.readObject());
                 /*--------------------------------------------------------------------------------------------------------------
                 // TODO: 2018/2/8/008
-                1.调用addSong方法时，会将第一首歌变成最后一首，最后一首变成第一首
-                2.以及，从流中读取出来的MusicNode对象中的Music对象，实际上并没有值在里面，是否去实现深拷贝？
+                1.以及，从流中读取出来的MusicNode对象中的Music对象，实际上并没有值在里面，是否去实现深拷贝？
                 --------------------------------------------------------------------------------------------------------------*/
-                addSong(node);
             }
             os.close();
+            /* 初始化播放列表 */
+            int i = buf.size();
+            while (i > 0){
+                --i;
+                addSong(buf.get(i));
+            }
             /* 由于调用addSong方法会将flag置为true,故应当在初始化完成之后，将flag置为false */
             flag = false;
         }catch (IOException | ClassNotFoundException ex){
@@ -108,7 +137,7 @@ import java.io.*;
      * 调用该方法前，先创建Music对象再创建MusicNode对象
      * @param newNode 添加进入列表的MusicNode
      */
-    public static void addSong(MusicNode newNode){
+    public void addSong(MusicNode newNode){
         //如果列表不为空
         if (FirstMusic != null){
             //修改指针
@@ -135,7 +164,7 @@ import java.io.*;
     /**
      * @param selectedNode 用于从歌曲链表中删除选定的歌曲
      */
-    public static void deleteSong(MusicNode selectedNode){
+    public void deleteSong(MusicNode selectedNode){
         //当选定的节点不是第一首乐曲也不是最后一首时
         if (selectedNode != FirstMusic && selectedNode != LastMusic){
             //修改指针
@@ -182,7 +211,7 @@ import java.io.*;
      *               返回采用KMP算法,遍历链表得到的匹配项
      * P.S.边计算边调用GU的显示程序，在GUI中显示匹配项(其他不匹配的不显示，当用户点击之后，再重新显示)
      */
-    public static void searchSong(String subStr) {
+    public void searchSong(String subStr) {
 
         MusicNode node = FirstMusic;
         int count = 1;//从列表第一首歌开始搜索
@@ -215,24 +244,55 @@ import java.io.*;
     /**
      * 保存音乐播放列表
      */
-    public static void save(){
-        /* 如果链表被修改才需要保存 */
+    public void save(){
+        /*如果链表被修改才需要保存*/
         if (flag){
-            int i = 0;
-            MusicNode node = FirstMusic;
-            try {
-                FileOutputStream fs = new FileOutputStream("InitOfMusicList.ser");
-                ObjectOutputStream os = new ObjectOutputStream(fs);
-                /* 先将上一次的序列化文件清空 */
-                os.writeObject(null);
-                /* 再将本次的数据写入序列化文件 */
-                while (i < sum){
-                    os.writeObject(node);
-                    node = node.next;
+            /* 如果链表不为空 */
+            if (sum != 0){
+                int i = 0;
+                MusicNode node = FirstMusic;
+                try {
+                    FileOutputStream fs = new FileOutputStream(initFileName);
+                    ObjectOutputStream os = new ObjectOutputStream(fs);
+                    /* 先将上一次的序列化文件清空 */
+                    os.writeObject(null);
+                    /* 再将本次的数据写入序列化文件 */
+                    while (i < sum){
+                        os.writeObject(node);
+                        node = node.next;
+                    }
+                    os.close();
+                } catch (IOException ex){
+                    ex.printStackTrace();
                 }
-                os.close();
-            } catch (IOException ex){
-                ex.printStackTrace();
+            }
+            /* 此时链表被修改且为空，故删除对应的序列化文件 */
+            else {
+                /* 如果是默认序列化文件则不删除仅置空 */
+                if (initFileName.equals("InitOfMusicList.ser")){
+                    try {
+                        FileOutputStream fs = new FileOutputStream(initFileName);
+                        ObjectOutputStream os = new ObjectOutputStream(fs);
+                        /* 将默认初始化文件清空 */
+                        os.writeObject(null);
+                    }catch (IOException ex){
+                        ex.printStackTrace();
+                    }
+                }
+                /* 不是默认序列化文件时，则删除 */
+                else{
+                    File selectedFile = new File(initFileName);
+                    /* 此时本该由save方法删除的文件已经不存在，则抛出一个已经删除了的提示 */
+                    if (!selectedFile.exists()){
+                        throw new InitException("文件出于某种原因不存在！！！");
+                    }
+                    /* 删除文件 */
+                    else {
+                        boolean flag =  selectedFile.delete();
+                        /* 当删除失败时，抛出错误 */
+                        if (!flag) throw new InitException("文件无法被删除！！！");
+                    }
+                }
             }
         }
     }

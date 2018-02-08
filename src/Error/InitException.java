@@ -1,12 +1,10 @@
 package Error;
 
 /**
- * 初始化错误
- * 代表以任何原因发生的初始化Music对象的错误
- * 目的：无论哪中原因导致了构造Music对象失败，
- * 都抛出错误使得本次构造作废，且不影响下一次构造，并输出到控制台或者日志文件
+ * 任何地方的初始化错误
+ * 包括解码器，以及MusicList等初始化错误
  */
-public class InitException extends DecoderException{
+public class InitException extends RuntimeException{
     public InitException(String errorMessage){
         super(errorMessage);
     }

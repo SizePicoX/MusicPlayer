@@ -1,13 +1,15 @@
 package com.Music;
 
 import ID3InfoDecoder.Decoder;
+
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 
 
 /**
  * 选择MP3文件以添加乐曲时的最小操作单元
  */
-public class Music {
+public class Music implements Serializable{
 
     //这些是显示在界面中的
     private String SongName;//乐曲名字
