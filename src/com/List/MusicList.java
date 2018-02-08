@@ -2,6 +2,7 @@ package com.List;
 
 import Implements.Implements;
 import Error.InitException;
+import Error.InitError;
 import java.io.*;
 import java.util.ArrayList;
 
@@ -41,14 +42,16 @@ import java.util.ArrayList;
     /**
      * 保存了当前乐曲列表的序列化文件。默认为 InitOfMusicList.ser
      */
-    private String initFileName;
+    private String initFileName = null;
 
     /**
      * 引用计数器.播放器只有一个默认播放列表，故使用引用计数来保证默认初始化仅能使用一次
      */
     private static int ReferenceCount = 0;
     /**
-     * @param initFileName 使用该序列化文件以初始化MusicList对象.
+     * 该方法用于在启动播放器时从用户数据里恢复音乐播放列表
+     * P.S.需要保证默认初始化仅使用一次,且输入进来的序列化文件是已经存在的
+     * @param initFileName 使用输入的已存在的序列化文件以初始化MusicList对象.
      *                     为null时即代表创建的列表为默认列表,其使用的序列化文件名为InitOfMusicList.ser
      *                     但默认初始化仅能使用一次
      */
@@ -59,14 +62,50 @@ import java.util.ArrayList;
             /* 引用计数加1 */
             ++ReferenceCount;
         }
-        /* 当连续使用两次默认初始化时，抛出错误 */
-        else if (initFileName == null && ReferenceCount == 1){
-            throw new InitException("不允许连续两次默认初始化！！！");
-        }
         /* 否则就以输入的序列化文件名来初始化 */
         else this.initFileName = initFileName;
-        /* 初始化 */
-        Init(initFileName);
+
+        try {
+            /* 初始化 */
+            Init(initFileName);
+        }catch (InitException ex){
+            int errorCode = ex.getErrorCode();
+            /* 将输出给用户看的错误信息 */
+            String errorMessage = ex.getMessage();
+            switch (errorCode){
+                /* 初始化时，由于某种原因，文件的部分数据丢失，说明可能文件部分损坏 */
+                case InitError.Part_File_Unreadable :{
+                    // TODO: 2018/2/8 使用GUI告诉用户文件部分损坏
+                    break;
+                }
+                /* 初始化时，整个文件都无法读取,说明可能文件损坏 */
+                case InitError.File_Unreadable :{
+                    // TODO: 2018/2/8 使用GUI告诉用户文件全部损坏
+                    break;
+                }
+            }
+        }
+    }
+    /**
+     * 用户接口
+     * 该方法用于创建一张全新的乐曲列表
+     * P.S.使用该方法后必须为列表选定一个序列化文件名以保存
+     */
+    public MusicList(){
+    }
+    /*--------------------------------------------------------------------------------------------------------------
+     MusicList的set方法
+    --------------------------------------------------------------------------------------------------------------*/
+    /**
+     * 用户接口
+     * P.S.当且仅当创建全新的播放列表之后才调用,且不允许同名
+     * @param initFileName 创建全新播放列表时指定的序列化文件名
+     */
+    public void setInitFileName(String initFileName){
+        // TODO: 2018/2/8 创建新列表时，应当不允许同名
+        this.initFileName = initFileName;
+        /* 创建即代表修改 */
+        flag = true;
     }
     /*--------------------------------------------------------------------------------------------------------------
       MusicList的get方法
@@ -93,15 +132,17 @@ import java.util.ArrayList;
      初始化MusicList方法
     --------------------------------------------------------------------------------------------------------------*/
     /**
-     * 初始化方法,用于初始化MusicList
+     * 初始化方法,使用用户数据来初始化MusicList以构造链表
      * 启动播放器时才需要解序列化
      * 整个程序运行期间只需要调用一次
+     * @param initFileName 输入进来的序列化文件名.
+     *                     P.S.我们应当保证输入进来的文件名指向已经创建了的的播放列表
      */
     private void Init(String initFileName){
+        /* 暂存从流中读取出来的MusicNode */
+        ArrayList<MusicNode> buf = new ArrayList<>(100);
         /* 初始化内存中的链表 */
         try {
-            /* 暂存从流中读取出来的MusicNode */
-            ArrayList<MusicNode> buf = new ArrayList<>(100);
             /* 打开流文件 */
             FileInputStream fs = new FileInputStream(initFileName);
             ObjectInputStream os = new ObjectInputStream(fs);
@@ -116,6 +157,7 @@ import java.util.ArrayList;
                 1.以及，从流中读取出来的MusicNode对象中的Music对象，实际上并没有值在里面，是否去实现深拷贝？
                 --------------------------------------------------------------------------------------------------------------*/
             }
+            /* 关闭流 */
             os.close();
             /* 初始化播放列表 */
             int i = buf.size();
@@ -125,9 +167,52 @@ import java.util.ArrayList;
             }
             /* 由于调用addSong方法会将flag置为true,故应当在初始化完成之后，将flag置为false */
             flag = false;
-        }catch (IOException | ClassNotFoundException ex){
-            ex.printStackTrace();
-            flag = false;
+        }
+        /* 给定的序列化文件正常读取但里面没有数据时 */
+        /* P.S.抛出该错误时，大概率时因为用户没有添加乐曲进入列表,故此时什么都不做 */
+        catch (ClassNotFoundException ex){
+            /* 此时什么都不用做 */
+        }
+        /* 此时读取流文件时候出错,那么已经读取了多少个MusicNode对象就往链表里插入多少个，然后报错 */
+        catch (IOException ex){
+            /* 当输入流抛出异常前已经读取了一部分MusicNode对象出来时 */
+            int i = buf.size();
+            if (i != 0){
+                while (i > 0){
+                    --i;
+                    addSong(buf.get(i));
+                }
+                /* 由于调用addSong方法会将flag置为true,故应当在初始化完成之后，将flag置为false */
+                flag = false;
+                /* 抛出异常 */
+                throw  new InitException("仅有一部分的数据被正常读取，其他的读取失败.",InitError.Part_File_Unreadable);
+            }
+            /* 此时整个文件都无法读取 */
+            else throw new InitException("文件读取失败.",InitError.File_Unreadable);
+        }
+    }
+    /**
+     * 保存音乐播放列表
+     */
+    public void save(){
+        /*如果链表被修改才需要保存*/
+        if (flag){
+            int i = 0;
+            MusicNode node = FirstMusic;
+            try {
+                FileOutputStream fs = new FileOutputStream(initFileName);
+                ObjectOutputStream os = new ObjectOutputStream(fs);
+                /* 先将上一次的序列化文件清空 */
+                os.writeObject(null);
+                /* 再将本次的数据写入序列化文件 */
+                while (i < sum){
+                    os.writeObject(node);
+                    node = node.next;
+                }
+                os.close();
+            } catch (IOException ex){
+                ex.printStackTrace();
+            }
         }
     }
     /*--------------------------------------------------------------------------------------------------------------
@@ -239,61 +324,6 @@ import java.util.ArrayList;
              这里调用GUI的显示程序
             --------------------------------------------------------------------------------------------------------------*/
 
-        }
-    }
-    /**
-     * 保存音乐播放列表
-     */
-    public void save(){
-        /*如果链表被修改才需要保存*/
-        if (flag){
-            /* 如果链表不为空 */
-            if (sum != 0){
-                int i = 0;
-                MusicNode node = FirstMusic;
-                try {
-                    FileOutputStream fs = new FileOutputStream(initFileName);
-                    ObjectOutputStream os = new ObjectOutputStream(fs);
-                    /* 先将上一次的序列化文件清空 */
-                    os.writeObject(null);
-                    /* 再将本次的数据写入序列化文件 */
-                    while (i < sum){
-                        os.writeObject(node);
-                        node = node.next;
-                    }
-                    os.close();
-                } catch (IOException ex){
-                    ex.printStackTrace();
-                }
-            }
-            /* 此时链表被修改且为空，故删除对应的序列化文件 */
-            else {
-                /* 如果是默认序列化文件则不删除仅置空 */
-                if (initFileName.equals("InitOfMusicList.ser")){
-                    try {
-                        FileOutputStream fs = new FileOutputStream(initFileName);
-                        ObjectOutputStream os = new ObjectOutputStream(fs);
-                        /* 将默认初始化文件清空 */
-                        os.writeObject(null);
-                    }catch (IOException ex){
-                        ex.printStackTrace();
-                    }
-                }
-                /* 不是默认序列化文件时，则删除 */
-                else{
-                    File selectedFile = new File(initFileName);
-                    /* 此时本该由save方法删除的文件已经不存在，则抛出一个已经删除了的提示 */
-                    if (!selectedFile.exists()){
-                        throw new InitException("文件出于某种原因不存在！！！");
-                    }
-                    /* 删除文件 */
-                    else {
-                        boolean flag =  selectedFile.delete();
-                        /* 当删除失败时，抛出错误 */
-                        if (!flag) throw new InitException("文件无法被删除！！！");
-                    }
-                }
-            }
         }
     }
 }

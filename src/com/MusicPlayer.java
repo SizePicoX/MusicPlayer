@@ -114,7 +114,9 @@ public class MusicPlayer implements Serializable,PlayMode {
             播放器的初始化方法
     --------------------------------------------------------------------------------------------------------------*/
     /*--------------------------------------------------------------------------------------------------------------
-     // TODO: 2018/2/8   该初始化方法需要更改，因为这里全部是静态方法
+     // TODO: 2018/2/8 重写初始化方法和保存方法 以及考察 setIndexOfCurrentMusicNode 方法
+     // TODO: 2018/2/8  !!!!!!!!!!!!!!!!!
+     // TODO: 2018/2/8  !!!!!!!!!!!!!!!!!
     --------------------------------------------------------------------------------------------------------------*/
     /**
      *解序列化方法,用于初始化音乐播放器
@@ -124,12 +126,13 @@ public class MusicPlayer implements Serializable,PlayMode {
      * @return 解序列化得到的MusicPlayer对象
      */
     public static MusicPlayer Init(MusicList currentMusicList){
+        // TODO: 2018/2/8 由于全部都是静态字段，故需要重写初始化方法
         /* 初始化指向音乐播放列表的指针 */
         musicList = currentMusicList;
 
         /* 取出CurrentMusicList */
         try {
-            FileInputStream fs = new FileInputStream("InitOfCurrentMusicList.ser");
+            FileInputStream fs = new FileInputStream("InitOfMusicPlayer.ser");
             ObjectInputStream os = new ObjectInputStream(fs);
             os.close();
             /* 采用readUnshared读取不断在改变的对象 */
@@ -141,6 +144,13 @@ public class MusicPlayer implements Serializable,PlayMode {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * 播放器的保存方法
+     */
+    public static void save(){
+        // TODO: 2018/2/8  怎么写播放器的保存方法呢？
     }
     /*--------------------------------------------------------------------------------------------------------------
             播放器的get方法
