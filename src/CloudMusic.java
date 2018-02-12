@@ -1,7 +1,11 @@
 import javax.swing.*;
 
 public class CloudMusic {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
+
+        String lookAndFeel ="com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+        UIManager.setLookAndFeel(lookAndFeel);
+
         JFrame frame = new JFrame("CloudMusic");
         frame.setContentPane(new CloudMusic().panel1);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

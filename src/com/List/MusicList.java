@@ -44,31 +44,15 @@ import java.io.*;
      * 保存有乐曲播放列表的序列化文件的相对路径。
      */
     private String initFileName = null;
-
-    /**
-     * 引用计数器.播放器只有一个默认播放列表，故使用引用计数来保证默认初始化仅能使用一次
-     */
-    private static int ReferenceCount = 0;
     /**
      * 该方法用于在启动播放器时从用户数据里恢复音乐播放列表
-     * P.S.需要保证默认初始化仅使用一次,且输入进来的序列化文件是已经存在的
+     * P.S.需要保证输入进来的序列化文件是已经存在的
      * @param initFileName 使用输入的已存在的序列化文件的相对路径以初始化MusicList对象.
-     *                     为null时即代表创建的列表为默认列表,其使用的序列化文件名为FirstMusicList.ser
-     *                     但默认初始化仅能使用一次
      */
     public MusicList(String initFileName){
-        /* 序列化文件默认为 FirstMusicList.ser */
-        if ( (initFileName == null || initFileName.equals("FirstMusicList.ser")) && ReferenceCount == 0){
-            initFileName = "FirstMusicList.ser";
-            /* 引用计数加1 */
-            ++ReferenceCount;
-            /* 将默认播放列表添加到数组里面 */
-            MusicPlayer.TotalMusicList.add(0,this);
-            /* 将默认播放列表的相对路径添加到数组里面 */
-            MusicPlayer.TotalMusicListFileName.add(0,initFileName);
-        }
-        /* 否则就以输入的序列化文件名来初始化 */
-        else this.initFileName = initFileName;
+
+        /* 设定乐曲列表序列化文件名字（相对路径） */
+        this.initFileName = initFileName;
 
         try {
             /* 初始化 */
@@ -97,18 +81,24 @@ import java.io.*;
      * P.S.使用该方法后必须为列表选定一个序列化文件名以保存
      */
     public MusicList(){
+
     }
     /*--------------------------------------------------------------------------------------------------------------
      MusicList的set方法
     --------------------------------------------------------------------------------------------------------------*/
     /**
-     * 用户接口
+     * 用户接口,用于根据给定的音乐列表名字在序列化文件数组中创建相应的表项
+     * 调用该方法后，视为用户创建列表成功
      * P.S.当且仅当创建全新的播放列表之后才调用,且不允许同名
-     * @param initFileName 创建全新播放列表时指定的序列化文件名
+     * @param MusicListName 创建全新播放列表时指定的播放列表名字
      */
-    public void setInitFileName(String initFileName){
+    public void setInitFileName(String MusicListName){
         // TODO: 2018/2/8 创建新列表时，应当不允许同名
-        this.initFileName = initFileName;
+        this.initFileName = MusicListName + ".ser";
+        /* 将用户新建播放列表对应的链表的序列化文件的相对路径添加到数组 */
+        MusicPlayer.TotalMusicListFileName.add(MusicPlayer.sum,MusicListName);
+        /* 将用户新建的MusicList对象添加到数组,并且列表总数加1 */
+        MusicPlayer.TotalMusicList.add(MusicPlayer.sum++,this);
         /* 创建即代表修改 */
         isModify = true;
     }
@@ -135,14 +125,10 @@ import java.io.*;
     }
 
     /**
-     * 调用该方法后，视为用户创建列表成功
+     *
      * @return 该MusicList对应的链表的序列化文件的相对路径
      */
     public String getInitFileName() {
-        /* 将用户新建播放列表对应的链表的序列化文件的相对路径添加到数组 */
-        MusicPlayer.TotalMusicListFileName.add(MusicPlayer.sum,initFileName);
-        /* 将用户新建的MusicList对象添加到数组,并且列表总数加1 */
-        MusicPlayer.TotalMusicList.add(MusicPlayer.sum++,this);
         return initFileName;
     }
     /*--------------------------------------------------------------------------------------------------------------

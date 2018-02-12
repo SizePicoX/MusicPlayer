@@ -5,13 +5,17 @@ import Implements.Implements;
 import com.List.MusicList;
 import com.List.MusicNode;
 import com.List.PlayMode;
+import com.Music.Music;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 音乐播放器所有功能的实现
  * 包括当前正在播放的歌曲以及当前播放模式
+ * P.S.乐曲链表保存在 D:\JAVA CODE\MusicPlayer\乐曲列表
  * 包含有不同播放模式的实现，这些都是基于MusicList的,同时实现各种播放模式不需要额外的构造一个新的MusicList
  */
 public class MusicPlayer implements Serializable,PlayMode {
@@ -141,6 +145,119 @@ public class MusicPlayer implements Serializable,PlayMode {
      */
     public static void Init(){
         // TODO: 2018/2/8 从ini文件中读取数据并将对应键值写入对应字段
+        /* 用户数据被保存的绝对路径 */
+        String filePath = "D:\\JAVA CODE\\MusicPlayer\\src\\config.ini";
+
+        try {
+
+            /* 用户设置数组 */
+            String[] userSetting = new String[6];
+            /* 用户设置数组对应的值 */
+            String[] userSettingValue = new String[6];
+
+            // 音乐播放器设置.匹配 MusicPlayer 段
+            /* 当前播放列表在数组中的位置 */
+            userSetting[0] = "indexOfCurrentMusicList";
+            /* 当前播放的乐曲是链表中第几个 */
+            userSetting[1] = "indexOfCurrentMusicNode";
+            /* 播放模式 */
+            userSetting[2] = "currentPlayMode";
+            /* 播放器的音量 */
+            userSetting[3] = "volume";
+            /* 当前进度条的位置 */
+            userSetting[4] = "currentPlayTime";
+            /* 乐曲列表总数 */
+            userSetting[5] = "sum";
+
+            BufferedReader reader = new BufferedReader(new FileReader(filePath));
+            String line;
+            /* 用于执行匹配 */
+            Pattern p;
+            Matcher m;
+
+            /* 开始匹配音乐播放器设置段 */
+            while ((line = reader.readLine()) != null){
+                /* 过滤空行 */
+                if (line.equals("")) {
+                    continue;
+                }
+                /* 过滤仅有注释的行 */
+                if (line.trim().split(";")[0].equals("")){
+                    continue;
+                }
+                p = Pattern.compile("\\[" + "MusicPlayer" + "]");
+                m = p.matcher(line);
+                /* 匹配到了指定的段(MusicPlayer)，则开始更新对应的字段 */
+                if (m.matches()) {
+                    /* 检索所有给定的字段 */
+                    for (int k = 0; k < userSetting.length ;++k){
+                        while ((line = reader.readLine()) != null){
+                            /* 当给定字段被匹配到时 */
+                            if (line.trim().split(";")[0].split(" = ")[0].equalsIgnoreCase(userSetting[k])){
+                                /* 读取对应字段的值 */
+                                userSettingValue[k] = line.trim().split(";")[0].split(" = ")[1];
+                                break;
+                            }
+                        }
+                    }
+                    /* MusicPlayer段匹配完成就退出本次循环 */
+                    break;
+                }
+            }
+
+            /* 初始化播放器设置 */
+            indexOfCurrentMusicList = Integer.valueOf(userSettingValue[0]);
+            indexOfCurrentMusicNode = Integer.valueOf(userSettingValue[1]);
+            currentPlayMode = Integer.valueOf(userSettingValue[2]);
+            volume = Integer.valueOf(userSettingValue[3]);
+            currentPlayTime = Double.valueOf(userSettingValue[4]);
+            sum = Integer.valueOf(userSettingValue[5]);
+
+            /* 开始匹配用户播放列表段 */
+            while ((line = reader.readLine()) != null){
+                /* 过滤空行 */
+                if (line.equals("")) {
+                    continue;
+                }
+                /* 过滤仅有注释的行 */
+                if (line.trim().split(";")[0].equals("")){
+                    continue;
+                }
+                p = Pattern.compile("\\[" + "MusicListPath" + "]");
+                m = p.matcher(line);
+                /* 当匹配到了对应段(MusicListPath),则写入 TotalMusicListFileName 数组 */
+                if (m.matches()){
+                    int i = 0;
+                    while (((line = reader.readLine()) != null) && i < sum){
+                        /* 过滤空行 */
+                        if (line.equals("")) {
+                            continue;
+                        }
+                        /* 过滤仅有注释的行 */
+                        if (line.trim().split(";")[0].equals("")){
+                            continue;
+                        }
+                        if (line.contains("TotalMusicListFilePath[" + i + "]")){
+                            TotalMusicListFileName.add(line.trim().split(";")[0].split(" = ")[1]);
+                            ++i;
+                        }
+                    }
+                }
+            }
+            /* 关闭流 */
+            reader.close();
+
+            /* 使用 TotalMusicListFileName 来初始化 TotalMusicList */
+            for (int i = 0; i < sum ; ++i){
+                TotalMusicList.add(new MusicList(TotalMusicListFileName.get(i)));
+            }
+            /* 根据上一次的记录以恢复当前播放列表以及当前播放乐曲 */
+            setCurrentMusicList(indexOfCurrentMusicList);
+            setCurrentMusicNode(indexOfCurrentMusicNode);
+
+        }catch (IOException ex){
+            ex.printStackTrace();
+        }
     }
     /**
      * 播放器的保存方法
@@ -148,18 +265,144 @@ public class MusicPlayer implements Serializable,PlayMode {
      * 用户数据将被保存到config.ini文件里面
      */
     public static void Save(){
+        /* 保存所有MusicList所对应的乐曲链表 */
         int i = 0;
         while (i < TotalMusicList.size()){
-            /* 保存所有MusicList所对应的乐曲链表 */
             TotalMusicList.get(i).Save();
             ++i;
         }
-        /* 再保存音乐播放器的设置 */
+
+        /* 找到当前播放列表是第几个 */
+        indexOfCurrentMusicList = getIndexOfCurrentMusicList();
+        /* 找到当前播放乐曲时当前播放列表中的第几首歌 */
+        indexOfCurrentMusicNode = getIndexOfCurrentMusicNode();
+
+        /* 用户数据将被保存的绝对路径 */
+        String filePath = "D:\\JAVA CODE\\MusicPlayer\\src\\config.ini";
+
+        /* 保存音乐播放器的设置及用户播放列表 */
         try {
-            FileWriter writer = new FileWriter("config.ini");
-            // TODO: 2018/2/8 修改ini文件中的对应键值
-            // TODO: 2018/2/8 使用正则表达式
-            //将 TotalMusicListFileName 中的每个元素保存
+            /* 需要修改的用户设置数组 */
+            String[] userSetting = new String[6];
+            /* 用户设置数组对应的值 */
+            String[] userSettingValue = new String[6];
+
+            // 音乐播放器设置.匹配 MusicPlayer 段
+            /* 当前播放列表在数组中的位置 */
+            userSetting[0] = "indexOfCurrentMusicList";
+            /* 当前播放的乐曲是链表中第几个 */
+            userSetting[1] = "indexOfCurrentMusicNode";
+            /* 播放模式 */
+            userSetting[2] = "currentPlayMode";
+            /* 播放器的音量 */
+            userSetting[3] = "volume";
+            /* 当前进度条的位置 */
+            userSetting[4] = "currentPlayTime";
+            /* 乐曲列表总数 */
+            userSetting[5] = "sum";
+
+            // 音乐播放器设置对应的新值
+            /* 当前播放列表在数组中的位置 */
+            userSettingValue[0] = Integer.toString(indexOfCurrentMusicList);
+            /* 当前播放的乐曲是链表中第几个 */
+            userSettingValue[1] = Integer.toString(indexOfCurrentMusicNode);
+            /* 播放模式 */
+            userSettingValue[2] = Integer.toString(currentPlayMode);
+            /* 播放音量 */
+            userSettingValue[3] = Integer.toString(volume);
+            /* 当前进度条的位置 */
+            userSettingValue[4] = Double.toString(currentPlayTime);
+            /* 乐曲列表总数 */
+            userSettingValue[5] = Integer.toString(sum);
+
+            /* 开始保存用户数据 */
+            BufferedReader reader = new BufferedReader(new FileReader(filePath));
+            String line;
+            /* 用于执行匹配 */
+            Pattern p;
+            Matcher m;
+            /* 暂存ini文件.每一个元素都是ini文件的一行 */
+            ArrayList<String> fileContent = new ArrayList<>(45);
+
+            /* 开始匹配音乐播放器设置段 */
+            while ((line = reader.readLine()) != null){
+                /* 过滤空行 */
+                if (line.equals("")) {
+                    fileContent.add(line);
+                    continue;
+                }
+                /* 过滤仅有注释的行 */
+                if (line.trim().split(";")[0].equals("")){
+                    fileContent.add(line);
+                    continue;
+                }
+                /* 保存上一行 */
+                fileContent.add(line);
+                p = Pattern.compile("\\[" + "MusicPlayer" + "]");
+                m = p.matcher(line);
+                /* 匹配到了指定的段(MusicPlayer)，则开始更新对应的字段 */
+                if (m.matches()) {
+                    /* 检索所有给定的字段 */
+                    for (int k = 0; k < userSetting.length ;++k){
+                        while ((line = reader.readLine()) != null){
+                            /* 当给定字段被匹配到时 */
+                            if (line.trim().split(";")[0].split(" = ")[0].equalsIgnoreCase(userSetting[k])){
+                                /* 当该字段中不含有分号时 */
+                                if (!line.contains(";")){
+                                    line = line.split(" = ")[0] + " = " + userSettingValue[k];
+                                    fileContent.add(line);
+                                }
+                                /* 当给定的字段中含有分号时 */
+                                else {
+                                    /* 修改对应的值 */
+                                    line = line.split(";")[0].split(" = ")[0] + " = " + userSettingValue[k] + ";" + line.split(";")[1];
+                                    /* 将修改后的值保存起来 */
+                                    fileContent.add(line);
+                                }
+                                break;
+                            }
+                            else fileContent.add(line);
+                        }
+                    }
+                    /* MusicPlayer段匹配完成就退出本次循环 */
+                    break;
+                }
+            }
+            /* 开始匹配用户播放列表段 */
+            while ((line = reader.readLine()) != null){
+                /* 过滤空行 */
+                if (line.equals("")) {
+                    fileContent.add(line);
+                    continue;
+                }
+                /* 过滤仅有注释的行 */
+                if (line.trim().split(";")[0].equals("")){
+                    fileContent.add(line);
+                    continue;
+                }
+                /* 保存上一行 */
+                fileContent.add(line);
+                p = Pattern.compile("\\[" + "MusicListPath" + "]");
+                m = p.matcher(line);
+                /* 暴力做法，直接不管用户的注释等 */
+                /* 当匹配到了对应段(MusicListPath),则更新对应字段 */
+                if (m.matches()){
+                    for (int n = 0; n < TotalMusicListFileName.size(); ++n){
+                        String str = "TotalMusicListFileName[" + n + "]" + " = " + TotalMusicListFileName.get(i);
+                        fileContent.add(str);
+                    }
+                    break;
+                }
+            }
+            /* 关闭流 */
+            reader.close();
+            BufferedWriter writer = new BufferedWriter(new FileWriter(filePath,false));
+            for (String aFileContent : fileContent) {
+                writer.write(aFileContent + "\n");
+            }
+            writer.flush();
+            /* 关闭流 */
+            writer.close();
         }catch (IOException ex){
             ex.printStackTrace();
         }
@@ -167,39 +410,52 @@ public class MusicPlayer implements Serializable,PlayMode {
     /*--------------------------------------------------------------------------------------------------------------
             播放器的get方法
     --------------------------------------------------------------------------------------------------------------*/
-    /**
-     * @return 当前正在播放的音乐
+    /**P.S.用户在使用播放器时并不知道自己所播放的是哪个列表的那首歌，所以需要该方法在退出播放器时找到用户的当前播放列表和乐曲
+     * 在save方法中使用，以设定indexOfCurrentMusicNode
+     * @return 当返回 -1 时代表没用找到，正常情况下，此时要么是用户没有播放任何一首歌，要么就是音乐列表为空
      */
-    public static MusicNode getCurrentMusicNode() {
-        return currentMusicNode;
+    private static int getIndexOfCurrentMusicNode() {
+        if (currentMusicNode != null && currentMusicList.getSum() != 0){
+            //计数器，以记录currentMusicNode在链表中是第几个元素
+            int cnt = 0;
+            //从当前列表的第一首乐曲开始检索
+            MusicNode node = currentMusicList.getFirstMusic();
+            while (!currentMusicNode.equals(node)){
+                node = node.next;
+                ++cnt;
+            }
+            return  cnt;
+        }
+        else return -1;
     }
-    /**
-     * @return 当前播放模式
+
+    /** P.S.用户在使用播放器时并不知道自己所播放的是哪个列表的那首歌，所以需要该方法在退出播放器时找到用户的当前播放列表和乐曲
+     * 在save方法中调用，以设定indexOfCurrentMusicList
+     * @return 当前播放列表在 TotalMusicList 数组中的位置
      */
-    public static int getCurrentPlayMode(){
-        return currentPlayMode;
+    private static int getIndexOfCurrentMusicList() {
+        return TotalMusicList.indexOf(currentMusicList);
     }
-    /**
-     * @return 当前播放器的音量
-     *         P.S.启动播放器时，音量需要调用该方法以设置当前的播放音量
-     */
-    public static int getVolume() {
-        return volume;
-    }
-    /**
-     * @return 获取当前这首歌的播放位置
-     *         P.S.启动播放器时，进度条需要调用该方法以设定当前的播放进度
-     */
-    public static double getCurrentPlayTime() {
-        return currentPlayTime;
-    }
-    /*--------------------------------------------------------------------------------------------------------------
+     /*--------------------------------------------------------------------------------------------------------------
             播放器的set方法
     --------------------------------------------------------------------------------------------------------------*/
     /**
-     * 设定播放器现在播放的乐曲,并立刻被序列化保存
-     * 当使用随机播放时，必须将用户设定的MusicNode入栈
-     * 然后GUI中的事件处理模块将播放currentMusicNode指向的音乐
+     * 当用户点击GUI中的某一个音乐列表时调用以设定当前播放列表
+     * @param selectedMusicList 用户所选定的播放列表
+     */
+    public static void setCurrentMusicList(MusicList selectedMusicList){
+        currentMusicList = selectedMusicList;
+    }
+    /**
+     * 初始化播放器时调用，根据上一次的记录以恢复当前播放列表
+     * @param indexOfCurrentMusicList  当前播放列表在数组中的位置
+     */
+    private static void setCurrentMusicList(int indexOfCurrentMusicList){
+        currentMusicList = TotalMusicList.get(indexOfCurrentMusicList);
+    }
+    /**
+     * 当用户点击GUI中的某一个音乐列表的乐曲时时调用以设定当前播放乐曲
+     * P.S.当使用随机播放时，必须将用户设定的MusicNode入栈
      * @param selectedMusicNode  用户点击的MusicNode
      */
     public  static void setCurrentMusicNode(MusicNode selectedMusicNode){
@@ -218,6 +474,19 @@ public class MusicPlayer implements Serializable,PlayMode {
         }
         //如果并非随机播放，则只需要修改指针即可
         currentMusicNode = selectedMusicNode;
+    }
+    /**
+     * 初始化播放器时调用，根据上一次的记录以恢复当前播放乐曲
+     * @param indexOfCurrentMusicNode  当前播放的乐曲是当前链表中第几个
+     */
+    private static void setCurrentMusicNode(int indexOfCurrentMusicNode){
+        int cnt = 0;
+        MusicNode node = currentMusicList.getFirstMusic();
+        while (cnt < indexOfCurrentMusicNode){
+            node = node.next;
+            ++cnt;
+        }
+        currentMusicNode = node;
     }
     /**
      * @param mode 选定的播放模式代码，仅允许0,1,2，
@@ -248,7 +517,7 @@ public class MusicPlayer implements Serializable,PlayMode {
         currentPlayTime = selectedCurrentPlayTime;
         // TODO: 2018/2/7  这里调用GUI中的方法以调节进度条
     }
-   /*--------------------------------------------------------------------------------------------------------------
+    /*--------------------------------------------------------------------------------------------------------------
    下面是各种播放模式的实现
    --------------------------------------------------------------------------------------------------------------*/
     /**
@@ -522,31 +791,24 @@ public class MusicPlayer implements Serializable,PlayMode {
     public static void stop(){
         // TODO: 2018/2/7  调用线程中断使得播放暂停
     }
+
     /**
-     * @return currentMusicNode在链表中是第几个元素
-     * 当返回 -1 时代表没用找到，正常情况下，此时要么是用户没有播放任何一首歌，要么就是音乐列表为空
-     * P.S.当且仅当推出播放器时才调用，以设定indexOfCurrentMusicNode
-     */
-    public static int setIndexOfCurrentMusicNode() {
-        if (currentMusicNode != null && currentMusicList.getSum() != 0){
-            //计数器，以记录currentMusicNode在链表中是第几个元素
-            int cnt = 1;
-            MusicNode node = currentMusicList.getFirstMusic();
-            while (!currentMusicNode.equals(node)){
-                node = node.next;
-                ++cnt;
-            }
-            return cnt;
-        }
-        //此时代表没有找到，出现异常
-        return -1;
-    }
-    /**
-     * 删除选定的音乐播放列表
+     *删除选定的音乐播放列表
      * P.S.无法删除默认列表
      * @param IndexOfSelectedList 选定的将要被删除的节点的下标
-     * @param flag 为true时，表示将该列表里的乐曲源文件也给删除
      */
-    public static void deleteMusicList(int IndexOfSelectedList,boolean flag){
+    public static void deleteMusicList(int IndexOfSelectedList){
+        TotalMusicListFileName.remove(IndexOfSelectedList);
+        MusicList list = TotalMusicList.get(IndexOfSelectedList);
+        MusicNode FirstMusic = list.getFirstMusic();
+        MusicNode node = FirstMusic;
+        int cnt = 0;
+        while (cnt < list.getSum()){
+            FirstMusic = FirstMusic.next;
+            MusicNode.DeleteSelectedNode(node);
+            node = FirstMusic;
+            ++cnt;
+        }
+        TotalMusicList.remove(IndexOfSelectedList);
     }
 }
