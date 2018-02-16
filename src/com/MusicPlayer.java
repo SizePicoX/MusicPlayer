@@ -23,6 +23,11 @@ public class MusicPlayer implements Serializable,PlayMode {
     /*--------------------------------------------------------------------------------------------------------------
             以下是播放器的各种控件对应的值，每次修改都务必序列化存储
     --------------------------------------------------------------------------------------------------------------*/
+    /**
+     * 当前正在播放的乐曲,退出播放器后再次启动，仍然播放这首歌
+     * P.S.(该字段并不保存到ini文件里)
+     */
+    public static  MusicNode currentMusicNode;
 
     /**
      * 当前播放列表在数组中的位置.这是真正被保存到ini文件里的字段
@@ -36,33 +41,27 @@ public class MusicPlayer implements Serializable,PlayMode {
     private static int indexOfCurrentMusicNode;
 
     /**
-     * 当前正在播放的乐曲,退出播放器后再次启动，仍然播放这首歌
-     * P.S.(该字段并不保存到ini文件里)
-     */
-    private static  MusicNode currentMusicNode;
-
-    /**
      * 播放模式,退出播放器后再次启动，仍然以该模式播放
      * 仅允许0，1，2这三个值中的一个
      * 默认为顺序播放
      */
-    private static int currentPlayMode;
+    public static int currentPlayMode;
 
     /**
      * 播放器的音量
      */
-    private static int volume;
+    public static int volume;
 
     /**
      * 当前进度条的位置
      */
-    private static double currentPlayTime;
+    public static double currentPlayTime;
 
 
     /**
      * 播放器正在播放的当前播放列表(该字段并不保存到ini文件里)
      */
-    private static MusicList currentMusicList;
+    public static MusicList currentMusicList;
 
     /**
      * 播放器管理的所有播放列表(该字段并不保存到ini文件)
@@ -146,7 +145,7 @@ public class MusicPlayer implements Serializable,PlayMode {
     public static void Init(){
         // TODO: 2018/2/8 从ini文件中读取数据并将对应键值写入对应字段
         /* 用户数据被保存的绝对路径 */
-        String filePath = "D:\\JAVA CODE\\MusicPlayer\\src\\config.ini";
+        String filePath = "src\\com\\config.ini";
 
         try {
 
@@ -278,7 +277,7 @@ public class MusicPlayer implements Serializable,PlayMode {
         indexOfCurrentMusicNode = getIndexOfCurrentMusicNode();
 
         /* 用户数据将被保存的绝对路径 */
-        String filePath = "D:\\JAVA CODE\\MusicPlayer\\src\\config.ini";
+        String filePath = "src\\com\\config.ini";
 
         /* 保存音乐播放器的设置及用户播放列表 */
         try {
@@ -436,16 +435,20 @@ public class MusicPlayer implements Serializable,PlayMode {
     private static int getIndexOfCurrentMusicList() {
         return TotalMusicList.indexOf(currentMusicList);
     }
+    /**
+     * 在GUI的系统托盘控件中调用
+     * @return 当前播放乐曲的基本信息.格式为: 乐曲名 - 歌手
+     * 当currentMusicNode为空时，返回 "CloudMusic"
+     */
+    public static String getCurrentMusicInfo(){
+        if (currentMusicNode != null){
+            return currentMusicNode.music.getSongName() + " - " + currentMusicNode.music.getArtist();
+        }
+        else return "CloudMusic";
+    }
      /*--------------------------------------------------------------------------------------------------------------
             播放器的set方法
     --------------------------------------------------------------------------------------------------------------*/
-    /**
-     * 当用户点击GUI中的某一个音乐列表时调用以设定当前播放列表
-     * @param selectedMusicList 用户所选定的播放列表
-     */
-    public static void setCurrentMusicList(MusicList selectedMusicList){
-        currentMusicList = selectedMusicList;
-    }
     /**
      * 初始化播放器时调用，根据上一次的记录以恢复当前播放列表
      * @param indexOfCurrentMusicList  当前播放列表在数组中的位置
@@ -454,6 +457,7 @@ public class MusicPlayer implements Serializable,PlayMode {
         currentMusicList = TotalMusicList.get(indexOfCurrentMusicList);
     }
     /**
+     * 在CloudMusic中调用
      * 当用户点击GUI中的某一个音乐列表的乐曲时时调用以设定当前播放乐曲
      * P.S.当使用随机播放时，必须将用户设定的MusicNode入栈
      * @param selectedMusicNode  用户点击的MusicNode
@@ -487,35 +491,6 @@ public class MusicPlayer implements Serializable,PlayMode {
             ++cnt;
         }
         currentMusicNode = node;
-    }
-    /**
-     * @param mode 选定的播放模式代码，仅允许0,1,2，
-     *             分别对应 顺序，随机，单曲循环
-     *             P.S.并立刻被序列化保存
-     */
-    public  static void setCurrentPlayMode(int mode) {
-        switch (mode){
-            case Mode_Sequential : currentPlayMode = Mode_Sequential;break;
-            case Mode_Random : currentPlayMode = Mode_Random;break;
-            case Mode_Loop : currentPlayMode = Mode_Loop;break;
-            default: //在这里报错
-        }
-    }
-    /**
-     * @param selectedVolume 设定的播放器的音量
-     *               P.S.用以实现播放器音量控制
-     */
-    public static void setVolume(int selectedVolume) {
-        volume = selectedVolume;
-        // TODO: 2018/2/7  这里调用GUI中的方法以调节声音大小
-    }
-    /**
-     * @param selectedCurrentPlayTime 设定当前这首歌的播放位置
-     *                        P.S.用以实现进度条的控制
-     */
-    public static void setCurrentPlayTime(int selectedCurrentPlayTime) {
-        currentPlayTime = selectedCurrentPlayTime;
-        // TODO: 2018/2/7  这里调用GUI中的方法以调节进度条
     }
     /*--------------------------------------------------------------------------------------------------------------
    下面是各种播放模式的实现
@@ -646,7 +621,7 @@ public class MusicPlayer implements Serializable,PlayMode {
             单曲循环时，不会自动调用getNextMusic方法
             单曲循环时不用清空nextMusic和priorMusic数组
             */
-            else {
+            else if (currentPlayMode == Mode_Loop){
                 /* 修改指针 */
                 currentMusicNode = currentMusicNode.next;
                 return currentMusicNode;
@@ -778,7 +753,7 @@ public class MusicPlayer implements Serializable,PlayMode {
             单曲循环时,不会自动调用getNextMusic方法
             单曲循环时不需要清空nextMusic和priorMusic数组
             */
-            else {
+            else if (currentPlayMode == Mode_Loop){
                 currentMusicNode = currentMusicNode.prior;
                 return currentMusicNode;
             }
@@ -794,21 +769,24 @@ public class MusicPlayer implements Serializable,PlayMode {
 
     /**
      *删除选定的音乐播放列表
-     * P.S.无法删除默认列表
+     * P.S.无法删除默认列表.同时，GUI中不应当有默认列表的删除键
      * @param IndexOfSelectedList 选定的将要被删除的节点的下标
      */
     public static void deleteMusicList(int IndexOfSelectedList){
-        TotalMusicListFileName.remove(IndexOfSelectedList);
-        MusicList list = TotalMusicList.get(IndexOfSelectedList);
-        MusicNode FirstMusic = list.getFirstMusic();
-        MusicNode node = FirstMusic;
-        int cnt = 0;
-        while (cnt < list.getSum()){
-            FirstMusic = FirstMusic.next;
-            MusicNode.DeleteSelectedNode(node);
-            node = FirstMusic;
-            ++cnt;
+        /* 当选定的不是默认列表时 */
+        if (IndexOfSelectedList != 0){
+            TotalMusicListFileName.remove(IndexOfSelectedList);
+            MusicList list = TotalMusicList.get(IndexOfSelectedList);
+            MusicNode FirstMusic = list.getFirstMusic();
+            MusicNode node = FirstMusic;
+            int cnt = 0;
+            while (cnt < list.getSum()){
+                FirstMusic = FirstMusic.next;
+                MusicNode.DeleteSelectedNode(node);
+                node = FirstMusic;
+                ++cnt;
+            }
+            TotalMusicList.remove(IndexOfSelectedList);
         }
-        TotalMusicList.remove(IndexOfSelectedList);
     }
 }

@@ -41,7 +41,7 @@ import java.io.*;
     private  boolean isModify = false;
 
     /**
-     * 保存有乐曲播放列表的序列化文件的相对路径。
+     * 保存有乐曲播放列表的序列化文件的名字。
      */
     private String initFileName = null;
     /**
@@ -90,7 +90,7 @@ import java.io.*;
      * 用户接口,用于根据给定的音乐列表名字在序列化文件数组中创建相应的表项
      * 调用该方法后，视为用户创建列表成功
      * P.S.当且仅当创建全新的播放列表之后才调用,且不允许同名
-     * @param MusicListName 创建全新播放列表时指定的播放列表名字
+     * @param MusicListName 创建新的播放列表时指定的播放列表名字
      */
     public void setInitFileName(String MusicListName){
         // TODO: 2018/2/8 创建新列表时，应当不允许同名

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="GUI.MiniCloudMusic">
+  <grid id="2fe7b" binding="myPanel" layout-manager="GridBagLayout">
+    <constraints>
+      <xy x="20" y="20" width="1848" height="400"/>
+    </constraints>
+    <properties>
+      <background color="-16777216"/>
+      <foreground color="-16777216"/>
+      <maximumSize width="314" height="116"/>
+    </properties>
+    <border type="line">
+      <title-color color="-1"/>
+      <color color="-14606047"/>
+    </border>
+    <children>
+      <grid id="27dc6" binding="playModule" layout-manager="GridBagLayout">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <background color="-16777216"/>
+          <foreground color="-16777216"/>
+        </properties>
+        <border type="line">
+          <color color="-14606047"/>
+        </border>
+        <children>
+          <component id="1bd" class="javax.swing.JButton" binding="priorMusic">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <background color="-16777216"/>
+              <borderPainted value="false"/>
+              <focusCycleRoot value="false"/>
+              <focusPainted value="false"/>
+              <focusTraversalPolicyProvider value="false"/>
+              <icon value="icon/priorMusic.png"/>
+              <margin top="0" left="0" bottom="0" right="0"/>
+              <opaque value="false"/>
+              <preferredSize width="48" height="48"/>
+              <text value=""/>
+            </properties>
+          </component>
+          <component id="cdc6" class="javax.swing.JButton" binding="play">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <background color="-16777216"/>
+              <borderPainted value="false"/>
+              <enabled value="true"/>
+              <focusPainted value="false"/>
+              <icon value="icon/play.png"/>
+              <margin top="0" left="0" bottom="0" right="0"/>
+              <opaque value="false"/>
+              <preferredSize width="48" height="48"/>
+              <selected value="false"/>
+              <selectedIcon value="icon/pause.png"/>
+              <text value=""/>
+            </properties>
+          </component>
+          <component id="f0a55" class="javax.swing.JButton" binding="nextMusic">
+            <constraints>
+              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <background color="-16777216"/>
+              <borderPainted value="false"/>
+              <focusPainted value="false"/>
+              <icon value="icon/nextMusic.png"/>
+              <margin top="0" left="0" bottom="0" right="0"/>
+              <opaque value="false"/>
+              <preferredSize width="48" height="48"/>
+              <text value=""/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="a3a9f" binding="titleBar" layout-manager="GridBagLayout">
+        <constraints>
+          <grid row="0" column="1" row-span="2" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <background color="-16777216"/>
+          <foreground color="-16777216"/>
+        </properties>
+        <border type="line">
+          <color color="-14606047"/>
+        </border>
+        <children>
+          <component id="13a41" class="javax.swing.JButton" binding="close">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <background color="-16777216"/>
+              <borderPainted value="false"/>
+              <focusPainted value="false"/>
+              <focusable value="true"/>
+              <foreground color="-4473925"/>
+              <icon value="icon/close.png"/>
+              <margin top="0" left="0" bottom="0" right="0"/>
+              <opaque value="false"/>
+              <preferredSize width="48" height="48"/>
+              <text value=""/>
+              <toolTipText value="关闭"/>
+            </properties>
+          </component>
+          <component id="33378" class="javax.swing.JButton" binding="enlarge">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <background color="-16777216"/>
+              <borderPainted value="false"/>
+              <focusPainted value="false"/>
+              <foreground color="-4473925"/>
+              <icon value="icon/enlarge.png"/>
+              <margin top="0" left="0" bottom="0" right="0"/>
+              <preferredSize width="48" height="48"/>
+              <text value=""/>
+              <toolTipText value="完整模式"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="43454" binding="musicInfoBar" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <background color="-16777216"/>
+          <foreground color="-4473925"/>
+        </properties>
+        <border type="line">
+          <color color="-14606047"/>
+        </border>
+        <children>
+          <component id="321ec" class="javax.swing.JTextArea" binding="musicInfo">
+            <constraints border-constraint="Center"/>
+            <properties>
+              <background color="-16777216"/>
+              <caretColor color="-1"/>
+              <columns value="0"/>
+              <disabledTextColor color="-1"/>
+              <dragEnabled value="true"/>
+              <editable value="false"/>
+              <focusCycleRoot value="false"/>
+              <focusTraversalPolicyProvider value="false"/>
+              <focusable value="false"/>
+              <font name="DialogInput" style="2"/>
+              <foreground color="-1"/>
+              <maximumSize width="123" height="27"/>
+              <preferredSize width="144" height="27"/>
+              <rows value="1"/>
+              <selectedTextColor color="-14606047"/>
+              <selectionColor color="-1"/>
+              <text value="乐曲名 - 歌手"/>
+            </properties>
+          </component>
+          <component id="d7fd" class="javax.swing.JSlider" binding="currentPlayTime">
+            <constraints border-constraint="South"/>
+            <properties>
+              <background color="-16777216"/>
+              <focusable value="true"/>
+              <font name="Courier New" style="3"/>
+              <paintTicks value="true"/>
+              <paintTrack value="true"/>
+              <preferredSize width="152" height="16"/>
+              <value value="0"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>
