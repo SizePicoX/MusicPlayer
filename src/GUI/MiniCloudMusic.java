@@ -26,8 +26,6 @@ public class MiniCloudMusic extends JFrame {
     private JButton enlarge;
     /* 其他组件 */
     private JTextArea musicInfo;
-    private JSlider currentPlayTime;
-
     /**
      * 拖动MiniCloudMusic相关字段
      * 记录下拖动组件时，鼠标相对于Frame的位置
@@ -70,11 +68,7 @@ public class MiniCloudMusic extends JFrame {
         /* 为其他组件添加监听器，使之可以拖拽 */
         setDraggable(musicInfo);
         /* 以下是playModule的监听器 */
-        /* 当currentMusicNode不存在时，不允许点击playModule中的组件 */
-//        MusicNode node = MusicPlayer.currentMusicNode;
-//        if (node != null){
-//            setPlayModuleListener(node);
-//        }
+        setPlayModuleListener();
         /* 以下是titleBar和musicInfoBar的监听器 */
         setBarListener();
         /* 添加组件 */
@@ -111,7 +105,8 @@ public class MiniCloudMusic extends JFrame {
         /* 当第一次启动MiniCloudMusic时，以屏幕最上方的中点为重定位初始值 */
         else {
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-            setLocation((int)screenSize.getWidth() / 2,0);
+            end_point = new Point(screenSize.width / 2,0);
+            setLocation(end_point);
         }
     }
     /**
@@ -125,14 +120,12 @@ public class MiniCloudMusic extends JFrame {
             public void mousePressed(MouseEvent e) {
                 /* 记录下鼠标第一次点击时相对于组件的位置 */
                 pre_point = new Point(e.getX(),e.getY());
-                /* 将光标置为手的形状 */
-                setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
                 /* 将光标置为手的形状 */
-                setCursor(new Cursor(Cursor.HAND_CURSOR));
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
 
             @Override
@@ -153,9 +146,9 @@ public class MiniCloudMusic extends JFrame {
     }
     /**
      * 为playModule设置监听器
-     * @param node 当前播放的MusicNode
+     * 当currentMusicNode不存在时，则点击将不会出发事件
      */
-    private void setPlayModuleListener(MusicNode node){
+    private void setPlayModuleListener(){
         /* priorMusic */
         priorMusic.addMouseListener(new MouseAdapter() {
             @Override
@@ -170,13 +163,18 @@ public class MiniCloudMusic extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 /* 播放乐曲 */
                 if (!play.isSelected()){
-                    play.setSelected(true);
-                    EnjoyYourMusic.play(node);
+                    // TODO: 2018/2/17 这里存在问题.当播放器初始化时和放了一会然后暂停然后又继续播放时怎么办?
+                    // TODO: 2018/2/17 当然，这不是GUI要去处理的事情
+                    MusicNode currentMusicNode = MusicPlayer.currentMusicNode;
+                    if (currentMusicNode.music.getMp3FilePath() != null){
+                        EnjoyYourMusic.play(currentMusicNode);
+                        play.setSelected(true);
+                    }
                 }
                 /* 暂停播放 */
                 else {
-                    play.setSelected(false);
                     MusicPlayer.stop();
+                    play.setSelected(false);
                 }
             }
         });
@@ -210,21 +208,13 @@ public class MiniCloudMusic extends JFrame {
 
             }
         });
-
-        /* currentPlayTime */
-        currentPlayTime.addMouseMotionListener(new MouseMotionAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                // TODO: 2018/2/15 这里添加调节播放进度的代码
-            }
-        });
     }
     /**
      * 使用该法官法以初始化MiniCloudMusic对象
      * @param tray MiniCloudMusic所绑定的系统托盘
      * @return MiniCloudMusic
      */
-    public static MiniCloudMusic getMiniCloudMusic(CloudMusicTray tray){
+    static MiniCloudMusic getMiniCloudMusic(CloudMusicTray tray){
         return new MiniCloudMusic(tray);
     }
     /**

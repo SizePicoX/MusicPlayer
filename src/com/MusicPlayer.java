@@ -27,7 +27,7 @@ public class MusicPlayer implements Serializable,PlayMode {
      * 当前正在播放的乐曲,退出播放器后再次启动，仍然播放这首歌
      * P.S.(该字段并不保存到ini文件里)
      */
-    public static  MusicNode currentMusicNode;
+    public static  MusicNode currentMusicNode = null;
 
     /**
      * 当前播放列表在数组中的位置.这是真正被保存到ini文件里的字段
@@ -61,7 +61,7 @@ public class MusicPlayer implements Serializable,PlayMode {
     /**
      * 播放器正在播放的当前播放列表(该字段并不保存到ini文件里)
      */
-    public static MusicList currentMusicList;
+    public static MusicList currentMusicList = null;
 
     /**
      * 播放器管理的所有播放列表(该字段并不保存到ini文件)
@@ -119,7 +119,7 @@ public class MusicPlayer implements Serializable,PlayMode {
      * 如果乐曲列表里没有11首歌，那么就保证前 sum - 1 次随机播放时播放不同的歌
      * E.G.当乐曲总共只有9首时，随机播放的前8首歌将互不相同，且都与根节点乐曲不同
      */
-    private static int maxCall = currentMusicList.getSum() < 11 ? currentMusicList.getSum() - 1 : 10;
+    private static int maxCall = currentMusicList.sum < 11 ? currentMusicList.sum - 1 : 10;
 
 
     /*--------------------------------------------------------------------------------------------------------------
@@ -414,7 +414,7 @@ public class MusicPlayer implements Serializable,PlayMode {
      * @return 当返回 -1 时代表没用找到，正常情况下，此时要么是用户没有播放任何一首歌，要么就是音乐列表为空
      */
     private static int getIndexOfCurrentMusicNode() {
-        if (currentMusicNode != null && currentMusicList.getSum() != 0){
+        if (currentMusicNode != null && currentMusicList.sum != 0){
             //计数器，以记录currentMusicNode在链表中是第几个元素
             int cnt = 0;
             //从当前列表的第一首乐曲开始检索
@@ -438,13 +438,13 @@ public class MusicPlayer implements Serializable,PlayMode {
     /**
      * 在GUI的系统托盘控件中调用
      * @return 当前播放乐曲的基本信息.格式为: 乐曲名 - 歌手
-     * 当currentMusicNode为空时，返回 "CloudMusic"
+     * 当currentMusicNode为空时，返回 "demo"
      */
     public static String getCurrentMusicInfo(){
         if (currentMusicNode != null){
             return currentMusicNode.music.getSongName() + " - " + currentMusicNode.music.getArtist();
         }
-        else return "CloudMusic";
+        else return "demo";
     }
      /*--------------------------------------------------------------------------------------------------------------
             播放器的set方法
@@ -552,7 +552,7 @@ public class MusicPlayer implements Serializable,PlayMode {
                         //如果生成的MusicNode在nextMusic里面，则继续循环直到随机到一个不在序列内的
                         while (nextMusic.indexOf(node) != -1){
                             //生成偏移量
-                            offset = Implements.GetRandomNum(currentMusicList.getSum());
+                            offset = Implements.GetRandomNum(currentMusicList.sum);
                             //计数器
                             int cnt = 1;
 
@@ -578,7 +578,7 @@ public class MusicPlayer implements Serializable,PlayMode {
                     //调用次数超过maxCall次时，则不同的调用可能输出相同的MusicNode
                     else {
                         //生成偏移量
-                        offset = Implements.GetRandomNum(currentMusicList.getSum());
+                        offset = Implements.GetRandomNum(currentMusicList.sum);
                         //计数器
                         int cnt = 1;
 
@@ -688,7 +688,7 @@ public class MusicPlayer implements Serializable,PlayMode {
                         //如果生成的MusicNode在priorMusic里面已经存在，则继续循环直到随机到一个不在序列内的
                         while (priorMusic.indexOf(node) != -1){
                             //生成偏移量
-                            offset = Implements.GetRandomNum(currentMusicList.getSum());
+                            offset = Implements.GetRandomNum(currentMusicList.sum);
                             //计数器
                             int cnt = 1;
 
@@ -714,7 +714,7 @@ public class MusicPlayer implements Serializable,PlayMode {
                     //调用次数超过maxCall次时，则不同的调用可能输出相同的MusicNode
                     else {
                         //生成偏移量
-                        offset = Implements.GetRandomNum(currentMusicList.getSum());
+                        offset = Implements.GetRandomNum(currentMusicList.sum);
                         //计数器
                         int cnt = 1;
 
@@ -764,7 +764,7 @@ public class MusicPlayer implements Serializable,PlayMode {
      * 调用线程中断使得播放暂停
      */
     public static void stop(){
-        // TODO: 2018/2/7  调用线程中断使得播放暂停
+        // TODO: 2018/2/7  调用线程wait使得播放暂停
     }
 
     /**
@@ -780,7 +780,7 @@ public class MusicPlayer implements Serializable,PlayMode {
             MusicNode FirstMusic = list.getFirstMusic();
             MusicNode node = FirstMusic;
             int cnt = 0;
-            while (cnt < list.getSum()){
+            while (cnt < list.sum){
                 FirstMusic = FirstMusic.next;
                 MusicNode.DeleteSelectedNode(node);
                 node = FirstMusic;

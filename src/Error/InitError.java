@@ -29,4 +29,9 @@ public interface InitError {
      * 文件的某部分无法读取
      */
     int Part_File_Unreadable = 3;
+
+    /**
+     *操作系统不支持系统托盘
+     */
+    int Tray_Cannot_Supported = 4;
 }

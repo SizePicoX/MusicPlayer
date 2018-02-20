@@ -20,8 +20,8 @@
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
-          <background color="-16777216"/>
-          <foreground color="-16777216"/>
+          <background color="-10241793"/>
+          <foreground color="-10241793"/>
         </properties>
         <border type="line">
           <color color="-14606047"/>
@@ -33,7 +33,7 @@
               <gridbag weightx="0.0" weighty="0.0"/>
             </constraints>
             <properties>
-              <background color="-16777216"/>
+              <background color="-10241793"/>
               <borderPainted value="false"/>
               <focusCycleRoot value="false"/>
               <focusPainted value="false"/>
@@ -41,7 +41,7 @@
               <icon value="icon/priorMusic.png"/>
               <margin top="0" left="0" bottom="0" right="0"/>
               <opaque value="false"/>
-              <preferredSize width="48" height="48"/>
+              <preferredSize width="32" height="32"/>
               <text value=""/>
             </properties>
           </component>
@@ -51,14 +51,14 @@
               <gridbag weightx="0.0" weighty="0.0"/>
             </constraints>
             <properties>
-              <background color="-16777216"/>
+              <background color="-10241793"/>
               <borderPainted value="false"/>
               <enabled value="true"/>
               <focusPainted value="false"/>
               <icon value="icon/play.png"/>
               <margin top="0" left="0" bottom="0" right="0"/>
               <opaque value="false"/>
-              <preferredSize width="48" height="48"/>
+              <preferredSize width="32" height="32"/>
               <selected value="false"/>
               <selectedIcon value="icon/pause.png"/>
               <text value=""/>
@@ -70,13 +70,13 @@
               <gridbag weightx="0.0" weighty="0.0"/>
             </constraints>
             <properties>
-              <background color="-16777216"/>
+              <background color="-10241793"/>
               <borderPainted value="false"/>
               <focusPainted value="false"/>
               <icon value="icon/nextMusic.png"/>
               <margin top="0" left="0" bottom="0" right="0"/>
               <opaque value="false"/>
-              <preferredSize width="48" height="48"/>
+              <preferredSize width="32" height="32"/>
               <text value=""/>
             </properties>
           </component>
@@ -88,8 +88,8 @@
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
-          <background color="-16777216"/>
-          <foreground color="-16777216"/>
+          <background color="-10241793"/>
+          <foreground color="-10241793"/>
         </properties>
         <border type="line">
           <color color="-14606047"/>
@@ -101,7 +101,7 @@
               <gridbag weightx="0.0" weighty="0.0"/>
             </constraints>
             <properties>
-              <background color="-16777216"/>
+              <background color="-10241793"/>
               <borderPainted value="false"/>
               <focusPainted value="false"/>
               <focusable value="true"/>
@@ -109,7 +109,7 @@
               <icon value="icon/close.png"/>
               <margin top="0" left="0" bottom="0" right="0"/>
               <opaque value="false"/>
-              <preferredSize width="48" height="48"/>
+              <preferredSize width="32" height="32"/>
               <text value=""/>
               <toolTipText value="关闭"/>
             </properties>
@@ -120,13 +120,13 @@
               <gridbag weightx="0.0" weighty="0.0"/>
             </constraints>
             <properties>
-              <background color="-16777216"/>
+              <background color="-10241793"/>
               <borderPainted value="false"/>
               <focusPainted value="false"/>
               <foreground color="-4473925"/>
-              <icon value="icon/enlarge.png"/>
+              <icon value="icon/maxiMizeOfMiniCloudMusic.png"/>
               <margin top="0" left="0" bottom="0" right="0"/>
-              <preferredSize width="48" height="48"/>
+              <preferredSize width="32" height="32"/>
               <text value=""/>
               <toolTipText value="完整模式"/>
             </properties>
@@ -139,8 +139,8 @@
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
-          <background color="-16777216"/>
-          <foreground color="-4473925"/>
+          <background color="-10241793"/>
+          <foreground color="-10241793"/>
         </properties>
         <border type="line">
           <color color="-14606047"/>
@@ -149,7 +149,7 @@
           <component id="321ec" class="javax.swing.JTextArea" binding="musicInfo">
             <constraints border-constraint="Center"/>
             <properties>
-              <background color="-16777216"/>
+              <background color="-10241793"/>
               <caretColor color="-1"/>
               <columns value="0"/>
               <disabledTextColor color="-1"/>
@@ -158,26 +158,14 @@
               <focusCycleRoot value="false"/>
               <focusTraversalPolicyProvider value="false"/>
               <focusable value="false"/>
-              <font name="DialogInput" style="2"/>
+              <font name="DialogInput" style="3"/>
               <foreground color="-1"/>
               <maximumSize width="123" height="27"/>
-              <preferredSize width="144" height="27"/>
+              <preferredSize width="96" height="27"/>
               <rows value="1"/>
               <selectedTextColor color="-14606047"/>
               <selectionColor color="-1"/>
               <text value="乐曲名 - 歌手"/>
-            </properties>
-          </component>
-          <component id="d7fd" class="javax.swing.JSlider" binding="currentPlayTime">
-            <constraints border-constraint="South"/>
-            <properties>
-              <background color="-16777216"/>
-              <focusable value="true"/>
-              <font name="Courier New" style="3"/>
-              <paintTicks value="true"/>
-              <paintTrack value="true"/>
-              <preferredSize width="152" height="16"/>
-              <value value="0"/>
             </properties>
           </component>
         </children>

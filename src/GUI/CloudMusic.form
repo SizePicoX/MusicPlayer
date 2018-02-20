@@ -1,11 +1,390 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="GUI.CloudMusic">
-  <grid id="27dc6" binding="panel" layout-manager="BorderLayout" hgap="0" vgap="0">
+  <grid id="27dc6" binding="myPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="20" y="20" width="500" height="400"/>
+      <xy x="20" y="20" width="819" height="400"/>
     </constraints>
-    <properties/>
-    <border type="none"/>
-    <children/>
+    <properties>
+      <background color="-16777216"/>
+      <preferredSize width="1000" height="600"/>
+    </properties>
+    <border type="none">
+      <title-color color="-16777216"/>
+      <color color="-16777216"/>
+    </border>
+    <children>
+      <grid id="12720" binding="list" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="West"/>
+        <properties>
+          <background color="-12828863"/>
+          <foreground color="-12828863"/>
+        </properties>
+        <border type="line">
+          <title-color color="-16777216"/>
+          <color color="-16777216"/>
+        </border>
+        <children>
+          <component id="20ace" class="javax.swing.JTextArea" binding="musicInfo">
+            <constraints border-constraint="South"/>
+            <properties>
+              <editable value="false"/>
+              <font name="DialogInput" style="3"/>
+              <lineWrap value="true"/>
+              <text value="乐曲基本信息"/>
+            </properties>
+          </component>
+          <grid id="7057b" binding="labelAndAddSongPanel" layout-manager="GridLayoutManager" row-count="2" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
+            <constraints border-constraint="North"/>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="61246" class="javax.swing.JLabel" binding="songList">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <font name="DialogInput" style="3"/>
+                  <text value="我的歌单"/>
+                </properties>
+              </component>
+              <vspacer id="6abe4">
+                <constraints>
+                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                </constraints>
+              </vspacer>
+              <component id="df06e" class="javax.swing.JButton" binding="addSongList">
+                <constraints>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <focusPainted value="false"/>
+                  <font name="DialogInput" style="3"/>
+                  <text value="创建歌单"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <component id="2a2bd" class="javax.swing.JList" binding="musicList">
+            <constraints border-constraint="Center"/>
+            <properties>
+              <font name="DialogInput" style="3"/>
+              <selectionBackground color="-4473925"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="8698a" binding="music" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="Center"/>
+        <properties/>
+        <border type="line">
+          <title-color color="-16777216"/>
+          <color color="-16777216"/>
+        </border>
+        <children>
+          <grid id="9ddc0" binding="musicListOperationAndLabelPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+            <constraints border-constraint="North"/>
+            <properties/>
+            <border type="none">
+              <title-color color="-16777216"/>
+            </border>
+            <children>
+              <component id="cff09" class="javax.swing.JLabel" binding="musicListName">
+                <constraints border-constraint="North"/>
+                <properties>
+                  <font name="DialogInput" style="3"/>
+                  <text value="歌单名"/>
+                </properties>
+              </component>
+              <grid id="54f3e" binding="labelPanel" layout-manager="GridLayoutManager" row-count="1" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints border-constraint="South"/>
+                <properties>
+                  <font name="DialogInput" style="3"/>
+                </properties>
+                <border type="line">
+                  <title-color color="-16777216"/>
+                  <color color="-16777216"/>
+                </border>
+                <children>
+                  <component id="4f25e" class="javax.swing.JLabel" binding="songName">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <font name="DialogInput" style="3"/>
+                      <text value="音乐标题"/>
+                    </properties>
+                  </component>
+                  <component id="f23b9" class="javax.swing.JLabel" binding="artist">
+                    <constraints>
+                      <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <font name="DialogInput" style="3"/>
+                      <text value="歌手"/>
+                    </properties>
+                  </component>
+                  <component id="eeb7f" class="javax.swing.JLabel" binding="album">
+                    <constraints>
+                      <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <font name="DialogInput" style="3"/>
+                      <text value="专辑"/>
+                    </properties>
+                  </component>
+                  <component id="148c5" class="javax.swing.JLabel" binding="songTime">
+                    <constraints>
+                      <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <font name="DialogInput" style="3"/>
+                      <text value="时长"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+              <grid id="40933" binding="musicListOperation" layout-manager="GridLayoutManager" row-count="2" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints border-constraint="Center"/>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <component id="b3ca1" class="javax.swing.JButton" binding="addSongs">
+                    <constraints>
+                      <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <focusPainted value="false"/>
+                      <font name="DialogInput" style="3"/>
+                      <margin top="3" left="21" bottom="3" right="21"/>
+                      <text value="匹配乐曲"/>
+                      <toolTipText value="将自动扫描您勾选的目录，文件增删实时同步"/>
+                    </properties>
+                  </component>
+                  <component id="b50e7" class="javax.swing.JButton" binding="addSingleSong">
+                    <constraints>
+                      <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <focusPainted value="false"/>
+                      <font name="DialogInput" style="3"/>
+                      <text value="添加单曲"/>
+                    </properties>
+                  </component>
+                  <component id="61565" class="javax.swing.JTextField" binding="searchSongs">
+                    <constraints>
+                      <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                        <preferred-size width="150" height="-1"/>
+                      </grid>
+                    </constraints>
+                    <properties>
+                      <font name="DialogInput" style="3"/>
+                      <text value="搜索乐曲"/>
+                    </properties>
+                  </component>
+                  <vspacer id="5d639">
+                    <constraints>
+                      <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                  </vspacer>
+                </children>
+              </grid>
+            </children>
+          </grid>
+          <grid id="d784" binding="currentMusicListPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+            <constraints border-constraint="Center"/>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="1727c" class="javax.swing.JList" binding="currentMusicList">
+                <constraints border-constraint="Center"/>
+                <properties>
+                  <font name="DialogInput" style="3"/>
+                  <selectionBackground color="-4473925"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+        </children>
+      </grid>
+      <grid id="4da97" binding="playModule" layout-manager="GridLayoutManager" row-count="1" column-count="5" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints border-constraint="South"/>
+        <properties>
+          <background color="-10241793"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <component id="699d1" class="javax.swing.JButton" binding="priorMusic">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <background color="-10241793"/>
+              <borderPainted value="false"/>
+              <focusPainted value="false"/>
+              <icon value="icon/priorMusic.png"/>
+              <margin top="0" left="0" bottom="0" right="0"/>
+              <text value=""/>
+            </properties>
+          </component>
+          <component id="f02ce" class="javax.swing.JButton" binding="nextMusic">
+            <constraints>
+              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <background color="-10241793"/>
+              <borderPainted value="false"/>
+              <focusPainted value="false"/>
+              <icon value="icon/nextMusic.png"/>
+              <margin top="0" left="0" bottom="0" right="0"/>
+              <text value=""/>
+            </properties>
+          </component>
+          <component id="7d52a" class="javax.swing.JButton" binding="play_pause">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <background color="-10241793"/>
+              <borderPainted value="false"/>
+              <focusPainted value="false"/>
+              <icon value="icon/play.png"/>
+              <margin top="0" left="0" bottom="0" right="0"/>
+              <selected value="false"/>
+              <selectedIcon value="icon/pause.png"/>
+              <text value=""/>
+            </properties>
+          </component>
+          <component id="db3e6" class="javax.swing.JProgressBar" binding="currentPlayTime">
+            <constraints>
+              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <font name="DialogInput" style="3"/>
+            </properties>
+          </component>
+          <component id="5306b" class="javax.swing.JComboBox" binding="playMode">
+            <constraints>
+              <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <background color="-10241793"/>
+              <font name="DialogInput" style="3"/>
+              <foreground color="-4473925"/>
+              <model>
+                <item value="顺序播放"/>
+                <item value="随机播放"/>
+                <item value="单曲循环"/>
+              </model>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="1b13c" binding="titleBar" layout-manager="GridLayoutManager" row-count="1" column-count="6" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints border-constraint="North"/>
+        <properties>
+          <background color="-10241793"/>
+          <foreground color="-10241793"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <component id="ac7d7" class="javax.swing.JLabel" binding="CloudMusic">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <font name="DialogInput" size="20" style="3"/>
+              <icon value="icon/titleIcon.png"/>
+              <text value="CloudMusic"/>
+            </properties>
+          </component>
+          <component id="6e3bc" class="javax.swing.JButton" binding="miniMode">
+            <constraints>
+              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
+                <minimum-size width="32" height="32"/>
+                <preferred-size width="32" height="32"/>
+                <maximum-size width="32" height="32"/>
+              </grid>
+            </constraints>
+            <properties>
+              <background color="-10241793"/>
+              <borderPainted value="false"/>
+              <enabled value="true"/>
+              <focusPainted value="false"/>
+              <icon value="icon/miniMode.png"/>
+              <margin top="0" left="0" bottom="0" right="0"/>
+              <text value=""/>
+              <toolTipText value="mini模式"/>
+            </properties>
+          </component>
+          <component id="4c367" class="javax.swing.JButton" binding="iconic">
+            <constraints>
+              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
+                <minimum-size width="32" height="32"/>
+                <preferred-size width="32" height="32"/>
+                <maximum-size width="32" height="32"/>
+              </grid>
+            </constraints>
+            <properties>
+              <background color="-10241793"/>
+              <borderPainted value="false"/>
+              <focusPainted value="false"/>
+              <icon value="icon/iconic.png"/>
+              <margin top="0" left="0" bottom="0" right="0"/>
+              <text value=""/>
+              <toolTipText value="最小化"/>
+            </properties>
+          </component>
+          <component id="d31b4" class="javax.swing.JButton" binding="close">
+            <constraints>
+              <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
+                <minimum-size width="32" height="32"/>
+                <preferred-size width="32" height="32"/>
+                <maximum-size width="32" height="32"/>
+              </grid>
+            </constraints>
+            <properties>
+              <background color="-10241793"/>
+              <borderPainted value="false"/>
+              <focusPainted value="false"/>
+              <icon value="icon/close.png"/>
+              <margin top="0" left="0" bottom="0" right="0"/>
+              <text value=""/>
+              <toolTipText value="关闭"/>
+            </properties>
+          </component>
+          <component id="1afe2" class="javax.swing.JButton" binding="maxiMize">
+            <constraints>
+              <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
+                <minimum-size width="32" height="32"/>
+                <preferred-size width="32" height="32"/>
+                <maximum-size width="32" height="32"/>
+              </grid>
+            </constraints>
+            <properties>
+              <background color="-10241793"/>
+              <borderPainted value="false"/>
+              <focusPainted value="false"/>
+              <foreground color="-10241793"/>
+              <icon value="icon/maxiMize.png"/>
+              <margin top="0" left="0" bottom="0" right="0"/>
+              <selected value="false"/>
+              <selectedIcon value="icon/normalSize.png"/>
+              <text value=""/>
+              <toolTipText value="最大化/最小化"/>
+            </properties>
+          </component>
+          <hspacer id="cf0f2">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </hspacer>
+        </children>
+      </grid>
+    </children>
   </grid>
 </form>
