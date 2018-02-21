@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="CloudMusicGUI.AddList">
+  <grid id="cbd77" binding="contentPane" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="48" y="54" width="436" height="297"/>
+    </constraints>
+    <properties>
+      <preferredSize width="260" height="150"/>
+    </properties>
+    <border type="none"/>
+    <children>
+      <grid id="8c5f5" binding="buttonPanel" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+        <constraints border-constraint="South"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="cda61" class="javax.swing.JButton" binding="buttonOK">
+            <constraints/>
+            <properties>
+              <background color="-4198401"/>
+              <focusPainted value="false"/>
+              <font name="DialogInput" style="2"/>
+              <text value="确认"/>
+            </properties>
+          </component>
+          <component id="4a6c3" class="javax.swing.JButton" binding="buttonCancel">
+            <constraints/>
+            <properties>
+              <focusPainted value="false"/>
+              <font name="DialogInput" style="2"/>
+              <text value="取消"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <component id="9bb6f" class="javax.swing.JTextArea" binding="textArea">
+        <constraints border-constraint="Center"/>
+        <properties>
+          <font name="DialogInput" style="2"/>
+          <lineWrap value="false"/>
+          <requestFocusEnabled value="true"/>
+          <text value=""/>
+        </properties>
+      </component>
+      <component id="a21f4" class="javax.swing.JLabel" binding="label">
+        <constraints border-constraint="North"/>
+        <properties>
+          <text value="请输入歌单标题"/>
+        </properties>
+      </component>
+    </children>
+  </grid>
+</form>

@@ -1,4 +1,4 @@
-package GUI;
+package CloudMusicGUI;
 
 import com.EnjoyYourMusic;
 import com.List.MusicNode;
@@ -35,12 +35,8 @@ public class MiniCloudMusic extends JFrame {
      * 拖动MiniCloudMusic相关字段
      * 拖动组件动作结束后，Frame的左上角顶点坐标
      */
-    private static Point end_point = null;
+    private static Point end_point;
 
-    /**
-     * MiniCloudMusic所关联的系统托盘
-     */
-    private CloudMusicTray tray;
     /**
      * 唯一的MiniCloudMusic对象.使用范例:
      * MiniCloudMusic.miniCloudMusic = MiniCloudMusic.getMiniCloudMusic(tray);
@@ -49,13 +45,11 @@ public class MiniCloudMusic extends JFrame {
     /**
      * 初始化一个MiniCloudMusic.设定其所有的界面,监听器,关联的系统托盘以及位置.
      */
-    private MiniCloudMusic(CloudMusicTray tray) {
+    private MiniCloudMusic() {
 
         /* 为MiniCloudMusic设定UI */
         setUI();
 
-        /* 设定MiniCloudMusic所关联的系统托盘 */
-        this.tray = tray;
 
         /* 为Frame设定拖拽 */
         setDraggable(this);
@@ -75,9 +69,12 @@ public class MiniCloudMusic extends JFrame {
         add(myPanel);
         /* 关闭边框 */
         setUndecorated(true);
-
-        /* 重定位Frame的位置 */
-        setLocation();
+        /* 将所有巨剑装入Frame中 */
+        pack();
+        /* 设定MiniCloudMusic的初始位置 */
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        end_point = new Point(screenSize.width / 2,0);
+        setLocation(end_point);
     }
     /**
      * 为MiniCloudMusic设定UI
@@ -95,21 +92,6 @@ public class MiniCloudMusic extends JFrame {
         }
     }
     /**
-     * 设定Frame的位置.具有记忆性.能够记录下上一次关闭MiniCloudMusic时窗体的位置
-     */
-    private void setLocation() {
-        /* 以上一次结束MiniCloudMusic的位置来重定位MiniCloudMusic */
-        if (end_point != null){
-            setLocation(end_point);
-        }
-        /* 当第一次启动MiniCloudMusic时，以屏幕最上方的中点为重定位初始值 */
-        else {
-            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-            end_point = new Point(screenSize.width / 2,0);
-            setLocation(end_point);
-        }
-    }
-    /**
      * 在关闭边框的情况下，使得MiniCloudMusic可拖拽
      * P.S.使用泛型，使得不必定义多个完全一样就是参数不同的方法
      */
@@ -123,8 +105,8 @@ public class MiniCloudMusic extends JFrame {
             }
 
             @Override
-            public void mouseReleased(MouseEvent e) {
-                /* 将光标置为手的形状 */
+            public void mouseExited(MouseEvent e) {
+                /* 鼠标离开时将光标复原 */
                 setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
 
@@ -197,7 +179,6 @@ public class MiniCloudMusic extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 /* 此时隐藏MiniCloudMusic.可以在系统托盘区找到它 */
                 setVisible(false);
-                tray.setCurrentFrame(miniCloudMusic);
             }
         });
 
@@ -205,31 +186,16 @@ public class MiniCloudMusic extends JFrame {
         enlarge.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-
+                setVisible(false);
+                CloudMusic.cloudMusic.setVisible(true);
             }
         });
     }
     /**
      * 使用该法官法以初始化MiniCloudMusic对象
-     * @param tray MiniCloudMusic所绑定的系统托盘
      * @return MiniCloudMusic
      */
-    static MiniCloudMusic getMiniCloudMusic(CloudMusicTray tray){
-        return new MiniCloudMusic(tray);
-    }
-    /**
-     * 测试
-     */
-    public static void main(String[] args){
-        long a = System.currentTimeMillis();
-        CloudMusicTray tray = new CloudMusicTray();
-        long b = System.currentTimeMillis();
-        System.out.println("创建系统托盘的时间 :" + ( b - a));
-        a = System.currentTimeMillis();
-        MiniCloudMusic.miniCloudMusic = MiniCloudMusic.getMiniCloudMusic(tray);
-        miniCloudMusic.pack();
-        b = System.currentTimeMillis();
-        System.out.println("创建MiniCloudMusic的时间 :" + ( b - a));
-        miniCloudMusic.setVisible(true);
+    public static MiniCloudMusic getMiniCloudMusic(){
+        return new MiniCloudMusic();
     }
 }
