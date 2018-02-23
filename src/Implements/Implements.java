@@ -1,8 +1,14 @@
 package Implements;
 
 
+import com.List.MusicList;
+import com.List.MusicNode;
+import com.Music.Music;
+
+import javax.swing.filechooser.FileFilter;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -110,5 +116,109 @@ public class Implements {
             /* 删除文件夹 */
             return selectedFolder.delete();
         }
+    }
+
+    /**
+     * 渲染器，修改musicInfoText的每一个子串的长度(方法是添加空格),
+     * 使得最终输出的字符串能够与GUI中的labelPanel组件的位置相匹配
+     *
+     * @param musicInfoText 包含乐曲信息的字符串
+     * @return 能够与labelPanel组件的位置相匹配的字符串
+     */
+    public static String renderer(String musicInfoText){
+
+        String[] text = musicInfoText.split(",");
+
+        //渲染SongName
+        int cnt_ch = 0;//每一乐曲字段中的中文字数
+        int cnt_en = 0;//每一乐曲字段中英文字数
+        char[] elements = text[0].toCharArray();
+        double px = 0.0;//text[0]对应的像素大小
+        for (char element : elements) {
+            //字符为英文时
+            if ((element > 'a' && element < 'z') || (element > 'A' && element < 'Z')){
+                px += 10.65;
+                ++cnt_en;
+            }
+            //为中文时
+            else {
+                px += 21.3;
+                ++cnt_ch;
+            }
+        }
+        if (px > 22 * 14){
+            text[0] = text[0].substring(0,cnt_ch + cnt_en / 2 - 3) + "...";
+        }
+        else {
+            StringBuilder str = new StringBuilder();
+            int i = (int)Math.floor((22 * 14 - px) / 14.0);//还需要补多少个空格
+            while (i > 0){
+                str.append(" ");
+                --i;
+            }
+            text[0] = text[0] + str;
+        }
+
+        //渲染Artist
+        cnt_ch = 0;
+        cnt_en = 0;
+        px = 0.0;
+        elements = text[1].toCharArray();
+        for (char element : elements) {
+            //字符为英文时
+            if ((element > 'a' && element < 'z') || (element > 'A' && element < 'Z')){
+                px += 10.65;
+                ++cnt_en;
+            }
+            //为中文时
+            else {
+                px += 21.3;
+                ++cnt_ch;
+            }
+        }
+        if (px > 20 * 14){
+            text[1] = text[1].substring(0,cnt_ch + cnt_en / 2 - 3) + "...";
+        }
+        else {
+            StringBuilder str = new StringBuilder();
+            int i = (int)Math.floor((20 * 14 - px) / 14.0);//还需要补多少个空格
+            while (i > 0){
+                str.append(" ");
+                --i;
+            }
+            text[1] = text[1] + str;
+        }
+
+        //渲染Album
+        cnt_ch = 0;
+        cnt_en = 0;
+        px = 0.0;
+        elements = text[2].toCharArray();
+        for (char element : elements) {
+            //字符为英文时
+            if ((element > 'a' && element < 'z') || (element > 'A' && element < 'Z')){
+                px += 10.65;
+                ++cnt_en;
+            }
+            //为中文时
+            else {
+                px += 21.3;
+                ++cnt_ch;
+            }
+        }
+        if (px > 18 * 14){
+            text[2] = text[2].substring(0,cnt_ch + cnt_en / 2 - 3) + "...          ";
+        }
+        else {
+            StringBuilder str = new StringBuilder();
+            int i = (int)Math.ceil((18 * 14 - px) / 14.0);//还需要补多少个空格
+            while (i > 0){
+                str.append(" ");
+                --i;
+            }
+            text[2] = text[2] + str;
+        }
+
+        return text[0] + text[1] + text[2] + text[3];
     }
 }

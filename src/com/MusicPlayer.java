@@ -5,7 +5,6 @@ import Implements.Implements;
 import com.List.MusicList;
 import com.List.MusicNode;
 import com.List.PlayMode;
-import com.Music.Music;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -32,7 +31,7 @@ public class MusicPlayer implements Serializable,PlayMode {
     /**
      * 当前播放列表在数组中的位置.这是真正被保存到ini文件里的字段
      */
-    private static int indexOfCurrentMusicList;
+    private static int indexOfCurrentMusicList ;
 
     /**
      * 记录下当前播放的乐曲是链表中第几个,以便下次初始化播放器时初始化currentMusicNode
@@ -119,7 +118,7 @@ public class MusicPlayer implements Serializable,PlayMode {
      * 如果乐曲列表里没有11首歌，那么就保证前 sum - 1 次随机播放时播放不同的歌
      * E.G.当乐曲总共只有9首时，随机播放的前8首歌将互不相同，且都与根节点乐曲不同
      */
-    private static int maxCall = currentMusicList.sum < 11 ? currentMusicList.sum - 1 : 10;
+    private static int maxCall;
 
 
     /*--------------------------------------------------------------------------------------------------------------
@@ -143,8 +142,7 @@ public class MusicPlayer implements Serializable,PlayMode {
      * 整个程序运行期间只需要调用一次
      */
     public static void Init(){
-        // TODO: 2018/2/8 从ini文件中读取数据并将对应键值写入对应字段
-        /* 用户数据被保存的绝对路径 */
+        /* 用户数据被保存的路径 */
         String filePath = "src\\com\\config.ini";
 
         try {
@@ -251,8 +249,11 @@ public class MusicPlayer implements Serializable,PlayMode {
                 TotalMusicList.add(new MusicList(TotalMusicListFileName.get(i)));
             }
             /* 根据上一次的记录以恢复当前播放列表以及当前播放乐曲 */
-            setCurrentMusicList(indexOfCurrentMusicList);
-            setCurrentMusicNode(indexOfCurrentMusicNode);
+            initCurrentMusicList(indexOfCurrentMusicList);
+            initCurrentMusicNode(indexOfCurrentMusicNode);
+
+            //初始化随机播放时，最大的产生不同随机乐曲的次数
+            maxCall = currentMusicList.sum < 11 ? currentMusicList.sum - 1 : 10;
 
         }catch (IOException ex){
             ex.printStackTrace();
@@ -413,7 +414,7 @@ public class MusicPlayer implements Serializable,PlayMode {
      * 在save方法中使用，以设定indexOfCurrentMusicNode
      * @return 当返回 -1 时代表没用找到，正常情况下，此时要么是用户没有播放任何一首歌，要么就是音乐列表为空
      */
-    private static int getIndexOfCurrentMusicNode() {
+    public static int getIndexOfCurrentMusicNode() {
         if (currentMusicNode != null && currentMusicList.sum != 0){
             //计数器，以记录currentMusicNode在链表中是第几个元素
             int cnt = 0;
@@ -438,52 +439,58 @@ public class MusicPlayer implements Serializable,PlayMode {
     /**
      * 在GUI的系统托盘控件中调用
      * @return 当前播放乐曲的基本信息.格式为: 乐曲名 - 歌手
-     * 当currentMusicNode为空时，返回 "demo"
+     * 当currentMusicNode为空时，返回 "CloudMusic"
      */
     public static String getCurrentMusicInfo(){
         if (currentMusicNode != null){
             return currentMusicNode.music.getSongName() + " - " + currentMusicNode.music.getArtist();
         }
-        else return "demo";
+        else return "CloudMusic";
     }
-     /*--------------------------------------------------------------------------------------------------------------
+    /*--------------------------------------------------------------------------------------------------------------
             播放器的set方法
     --------------------------------------------------------------------------------------------------------------*/
+    /**
+     * 设定当前正在播放的乐曲列表
+     * @param indexOfCurrentMusicList 当前播放列表在数组中的位置
+     */
+
+     public static void setCurrentMusicList(int indexOfCurrentMusicList){
+         initCurrentMusicList(indexOfCurrentMusicList);
+     }
     /**
      * 初始化播放器时调用，根据上一次的记录以恢复当前播放列表
      * @param indexOfCurrentMusicList  当前播放列表在数组中的位置
      */
-    private static void setCurrentMusicList(int indexOfCurrentMusicList){
+    private static void initCurrentMusicList(int indexOfCurrentMusicList){
         currentMusicList = TotalMusicList.get(indexOfCurrentMusicList);
     }
     /**
-     * 在CloudMusic中调用
      * 当用户点击GUI中的某一个音乐列表的乐曲时时调用以设定当前播放乐曲
      * P.S.当使用随机播放时，必须将用户设定的MusicNode入栈
-     * @param selectedMusicNode  用户点击的MusicNode
+     *
      */
-    public  static void setCurrentMusicNode(MusicNode selectedMusicNode){
+    public  static void setCurrentMusicNode(int indexOfCurrentMusicNode){
+        initCurrentMusicNode(indexOfCurrentMusicNode);
         //当使用随机播放时，必须将用户设定的MusicNode入栈
         if (currentPlayMode == Mode_Random){
             //当priorMusic中没有数据时，向nextMusic中写入数据
             if (indexOfPrior == -1){
-                nextMusic.add(selectedMusicNode);
+                nextMusic.add(currentMusicNode);
                 ++indexOfNext;
             }
             //反之，当nextMusic中没有数据时，向priorMusic中写入数据
             else {
-                priorMusic.add(selectedMusicNode);
+                priorMusic.add(currentMusicNode);
                 ++indexOfPrior;
             }
         }
-        //如果并非随机播放，则只需要修改指针即可
-        currentMusicNode = selectedMusicNode;
     }
     /**
      * 初始化播放器时调用，根据上一次的记录以恢复当前播放乐曲
      * @param indexOfCurrentMusicNode  当前播放的乐曲是当前链表中第几个
      */
-    private static void setCurrentMusicNode(int indexOfCurrentMusicNode){
+    private static void initCurrentMusicNode(int indexOfCurrentMusicNode){
         int cnt = 0;
         MusicNode node = currentMusicList.getFirstMusic();
         while (cnt < indexOfCurrentMusicNode){
@@ -763,7 +770,7 @@ public class MusicPlayer implements Serializable,PlayMode {
     /**
      * 调用线程中断使得播放暂停
      */
-    public static void stop(){
+    public static void pause(){
         // TODO: 2018/2/7  调用线程wait使得播放暂停
     }
 

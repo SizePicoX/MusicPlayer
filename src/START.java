@@ -2,6 +2,7 @@ import CloudMusicGUI.CloudMusic;
 import CloudMusicGUI.CloudMusicTray;
 import CloudMusicGUI.MiniCloudMusic;
 import CloudMusicGUI.Tips;
+import com.MusicPlayer;
 
 import java.awt.*;
 
@@ -10,6 +11,8 @@ import java.awt.*;
  */
 public class START {
     public static void main(String[] args){
+        //初始化MusicPlayer
+        MusicPlayer.Init();
         //当且仅当系统支持系统托盘时，才初始化系统托盘
         if (SystemTray.isSupported()){
             //获得系统托盘
@@ -25,10 +28,11 @@ public class START {
             tips.pack();
             tips.setVisible(true);
         }
-        //初始化CloudMusic
-        CloudMusic.cloudMusic = CloudMusic.getCloudMusic();
+
+        Thread cloudMusicThread = new Thread(CloudMusic.getCloudMusic(),"cloudMusicThread");
+        cloudMusicThread.start();
         //初始化MiniCloudMusic
         MiniCloudMusic.miniCloudMusic = MiniCloudMusic.getMiniCloudMusic();
-        CloudMusic.cloudMusic.setVisible(true);
+
     }
 }

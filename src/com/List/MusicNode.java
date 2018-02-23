@@ -33,4 +33,29 @@ public class MusicNode implements Serializable{
         selectedNode.next = null;
         selectedNode.music = null;
     }
+
+    /**
+     * @return 该MusicNode的基本信息
+     */
+    @Override
+    public String toString() {
+        return music.getSongName() + "," + music.getArtist() + "," +
+                music.getAlbum() + "," + music.getSongTime();
+    }
+
+    /**
+     * 比较两个MusicNode所指向的Music的内容是否完全一样.
+     * @param node 待比较的MusicNode
+     * @return  当两个MusicNode所指向的Music的内容完全一样时，返回true
+     */
+    public boolean isSame(MusicNode node){
+        return music.isSame(node.music);
+    }
+
+    /**
+     * @return 正在播放的乐曲的基本信息.格式为： 乐曲名 - 歌手
+     */
+    public String getMusicInfo(){
+        return music.getSongName() + " - " + music.getArtist();
+    }
 }

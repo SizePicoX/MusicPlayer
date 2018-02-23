@@ -317,4 +317,24 @@ import java.io.*;
 
         }
     }
+
+    @Override
+    public String toString() {
+        return initFileName;
+    }
+
+    /**
+     * @param selectedNode 待检测的MusicNode
+     * @return 如果在该列表中存在指向的Music与待检测的MusicNode所指向的Music完全一样的结点，则返回true
+     */
+    public boolean contains(MusicNode selectedNode){
+        int cnt = sum;
+        MusicNode node = FirstMusic;
+        while (cnt > 0){
+            if (selectedNode.isSame(node)) return true;
+            node = node.next;
+            --cnt;
+        }
+        return false;
+    }
 }

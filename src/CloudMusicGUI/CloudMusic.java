@@ -1,23 +1,32 @@
 package CloudMusicGUI;
 
+import Implements.Implements;
+import com.EnjoyYourMusic;
+import com.List.MusicList;
 import com.List.MusicNode;
-
+import com.List.PlayMode;
+import com.Music.Music;
+import com.MusicPlayer;
 import java.awt.Insets;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
 
-public class CloudMusic extends JFrame{
+public class CloudMusic extends JFrame implements Runnable{
     /* CloudMusic根面板 */
     private JPanel myPanel;
     /* list组件 */
     private JPanel list;//list主面板
-    private JTextArea musicInfo;//显示乐曲基本信息的文本框.格式为 "乐曲名-歌手"
+    public  JTextArea musicInfo;//显示乐曲基本信息的文本框.格式为 "乐曲名-歌手"
     private JPanel labelAndAddSongPanel;//"我的歌单"标签和"添加歌单"按钮
     private JLabel songList;//"我的歌单"标签
     private JButton addSongList;//添加歌单按钮
-    private JList<MusicNode> musicList;//当前所有乐曲列表
+    private JScrollPane musicListScrollPane;
+    private JList<String> musicList;//当前所有乐曲列表
     /* music组件 */
     private JPanel music;//music主面板
     private JPanel musicListOperationAndLabelPanel;//对musicList的相关操作及label的面板
@@ -28,19 +37,20 @@ public class CloudMusic extends JFrame{
     private JLabel album;//专辑
     private JLabel songTime;//时长
     private JPanel musicListOperation;//musicList的相关操作面板
-    private JButton choseFolder;//选择目录
+    private JButton addSongs;//添加乐曲
     private JButton matchSongs;//匹配乐曲
     private JTextField searchSongs;//搜索乐曲
     private JButton cleanSearchField;
     private JPanel currentMusicListPanel;//当前显示的乐曲列表的面板
-    private JList<MusicNode> currentMusicList;//当前显示的乐曲列表
+    private JScrollPane currentMusicListScrollPane;
+    private JList<String> currentMusicList;//当前显示的乐曲列表
     /* playModule组件 */
     private JPanel playModule;//playModule主面板
     private JButton priorMusic;//上一首
     private JButton nextMusic;//下一首
     private JButton play_pause;//开始和暂停
-    private JProgressBar currentPlayTime;//进度条
     private JComboBox playMode;//播放模式
+    private JSlider currentPlayTime;
     /* titleBar组件 */
     private JPanel titleBar;//titleBar主面板
     private JLabel CloudMusic;//"CloudMusic"标签
@@ -49,6 +59,9 @@ public class CloudMusic extends JFrame{
     private JButton close;//关闭
     private JButton maxiMize;//最大化
 
+    //GUI主面板所管理的JList的数据模式
+    private static DefaultListModel<String> musicListModel;
+    private static DefaultListModel<String> currentMusicListListModel;
 
     /* 拖动CloudMusic相关 */
     private static Point pre_point;
@@ -71,6 +84,22 @@ public class CloudMusic extends JFrame{
     private static boolean isValueEffective = false;
 
     /**
+     * 标记currentOperationList是否被更新
+     */
+    private static boolean isMusicListUpdate = false;
+
+    /**
+     * 当前正在操作的音乐播放列表.
+     */
+    private static MusicList currentOperationList;
+
+    /**
+     * 标记播放线程是采用自动连播还是根据给定的MusicNode来播放
+     * 为true则代表采用自动连播
+     */
+    public static boolean isAutomaticPlay = true;
+
+    /**
      * 唯一的CloudMusic对象.使用范例:
      * CloudMusic.cloudMusic = CloudMusic.getCloudMusic(tray);
      */
@@ -80,14 +109,17 @@ public class CloudMusic extends JFrame{
      * 通过该方法以启动播放器的主界面
      */
     private CloudMusic(){
+
+        currentOperationList = MusicPlayer.currentMusicList;
+
         /* 为CloudMusic设定UI */
         setUI();
 
         /* 设定组件的监听器 */
-        setListenerForList();
-        setListenerForMusic();
-        setListenerForPlayModule();
-        setListenerForTitleBar();
+        initForList();
+        initForMusic();
+        initForPlayModule();
+        initForTitleBar();
 
         /* 添加组件 */
         add(myPanel);
@@ -110,6 +142,10 @@ public class CloudMusic extends JFrame{
      * 为CloudMusic设定UI
      */
     private void setUI(){
+        /* 设定图标 */
+        ImageIcon icon = new ImageIcon("src\\icon\\format.png");
+        setIconImage(icon.getImage());
+
         /* 设定LookAndFell */
         String lookAndFeel = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
         try {
@@ -117,11 +153,6 @@ public class CloudMusic extends JFrame{
         } catch (ClassNotFoundException | InstantiationException | UnsupportedLookAndFeelException | IllegalAccessException e) {
             e.printStackTrace();
         }
-        /* 设定图标 */
-        ImageIcon icon = new ImageIcon("src\\icon\\format.png");
-        setIconImage(icon.getImage());
-        /* 去掉标题栏,以添加自己的标题栏 */
-        setUndecorated(true);
 
         /* titleBar的组件的数组 */
         JComponent[] titleBarComponents = {titleBar,miniMode,iconic, maxiMize,close,CloudMusic};
@@ -130,11 +161,13 @@ public class CloudMusic extends JFrame{
             setCursorAndDraggableForTitleBar(component);
         }
         /* 其他需要设定鼠标经过光标的组件的数组 */
-        JComponent[] components = {priorMusic,nextMusic,play_pause,playMode,addSongList, choseFolder, matchSongs,cleanSearchField};
+        JComponent[] components = {priorMusic,nextMusic,play_pause,playMode,addSongList, addSongs, matchSongs,cleanSearchField};
         /* 为playModule组件组件设定UI */
         for (JComponent component : components){
             setCursorForComponent(component);
         }
+        /* 去掉标题栏,以添加自己的标题栏 */
+        setUndecorated(true);
     }
     /**
      * 使得CloudMusic能够被拖拽
@@ -206,7 +239,12 @@ public class CloudMusic extends JFrame{
     /**
      * 为list添加监听器
      */
-    private void setListenerForList(){
+    private void initForList(){
+        //初始化musicList
+        musicListModel = new DefaultListModel<>();
+        musicList.setModel(musicListModel);
+        //将JList添加到ScrollPane
+        musicListScrollPane.setViewportView(musicList);
         //创建歌单
         addSongList.addMouseListener(new MouseAdapter() {
             @Override
@@ -216,25 +254,81 @@ public class CloudMusic extends JFrame{
                 AddList addList = new AddList(point);
                 addList.pack();
                 addList.setVisible(true);
+                // TODO: 2018/2/22 这里添加创建歌单的代码
+                // TODO: 2018/2/22 不允许有相同名字的歌单
             }
         });
         //musicList的监听器.双击以转到选定歌单
-        // TODO: 2018/2/21 musicList的监听器.双击以转到选定歌单
+        musicList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2){
+                    JList list = (JList) e.getSource();
+                    int index = list.getSelectedIndex();
+                    // TODO: 2018/2/22 这里添加musicList相关代码
+                }
+            }
+        });
     }
 
     /**
      * 为music设置监听器
      */
-    private void setListenerForMusic(){
-        //选择目录
-        choseFolder.addMouseListener(new MouseAdapter() {
+    private void initForMusic(){
+        //初始化currentMusicList
+        currentMusicListListModel = new DefaultListModel<>();
+        currentMusicList.setModel(currentMusicListListModel);
+        //将currentMusicList添加到ScrollPane
+        currentMusicListScrollPane.setViewportView(currentMusicList);
+        //添加乐曲
+        // TODO: 2018/2/23 添加乐曲功能对用户不在播放器内删除乐曲的支持并不良好
+        addSongs.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Point point = new Point(end_point.x + cloudMusic.getWidth() / 2 - 150,
-                        end_point.y + cloudMusic.getHeight() / 2 - 100);
-                AddSongs choseFolder = new AddSongs(point);
-                choseFolder.pack();
-                choseFolder.setVisible(true);
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("选择本地音乐文件或文件夹");
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);//允许选择文件和文件夹
+                fileChooser.setMultiSelectionEnabled(true);//允许选择多个文件
+                //仅允许选择MP3，WMA，WAV文件
+                fileChooser.removeChoosableFileFilter(fileChooser.getAcceptAllFileFilter());
+                FileNameExtensionFilter filterMp3 = new FileNameExtensionFilter("mp3 文件", "mp3");
+//                FileNameExtensionFilter filterWMA = new FileNameExtensionFilter("wma 文件","wma");
+//                FileNameExtensionFilter filterWAV = new FileNameExtensionFilter("wav 文件","wav");
+                fileChooser.addChoosableFileFilter(filterMp3);
+//                fileChooser.addChoosableFileFilter(filterWMA);
+//                fileChooser.addChoosableFileFilter(filterWAV);
+                int returnVal;
+                returnVal = fileChooser.showOpenDialog(cloudMusic);
+                //当用户点击确定按钮时才添加到链表
+                if (JFileChooser.APPROVE_OPTION == returnVal){
+                    //根据用户选择的目录开始扫描mp3文件
+                    File[] file = fileChooser.getSelectedFiles();
+                    if (file != null) {
+                        for (File aFile : file) {
+                            //保证不会添加已存在的元素
+                            cloudMusic.addSongs(aFile, currentOperationList);
+                        }
+                        //将添加到链表里的数据显示到GUI
+                        //更新GUI的操作必须在SwingUtilities线程里面进行
+                        //链表被更新时，才更新GUI
+                        if (isMusicListUpdate) {
+                            currentMusicListListModel.clear();
+                            SwingUtilities.invokeLater(() -> {
+                                int cnt = currentOperationList.sum;
+                                if (cnt != 0) {
+                                    MusicNode node = currentOperationList.getFirstMusic();
+                                    while (cnt > 0) {
+                                        currentMusicListListModel.addElement(Implements.renderer(node.toString()));
+                                        node = node.next;
+                                        --cnt;
+                                    }
+                                }
+                            });
+                            //保证链表被更新时才更新GUI
+                            isMusicListUpdate = false;
+                        }
+                    }
+                }
             }
         });
         //匹配乐曲
@@ -288,46 +382,80 @@ public class CloudMusic extends JFrame{
             }
         });
         //currentMusicList的监听器.双击以播放乐曲
-        // TODO: 2018/2/21 currentMusicList的监听器.双击以播放乐曲
+        currentMusicList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                //使用鼠标左键双击时
+                if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2){
+                    JList list = (JList) e.getSource();
+                    //当双击与当前播放乐曲不同的乐曲时才播放
+                    if (MusicPlayer.getIndexOfCurrentMusicNode() != list.getSelectedIndex()){
+                        //设定当前正在播放的乐曲
+                        MusicPlayer.setCurrentMusicNode(list.getSelectedIndex());
+
+                        if (!CloudMusicThreadManager.playMusic.isAlive()){
+                            CloudMusicThreadManager.playMusic.start();
+                        }
+                        else {
+                            try {
+                                EnjoyYourMusic.buffer.close();
+                                EnjoyYourMusic.buffer = null;
+                                isAutomaticPlay = false;
+                            } catch (IOException ex) {
+                                //do nothing
+                                //只是为了引发播放线程终止播放当前乐曲并播放选中的歌
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 
     /**
      * 为playModule设置监听器
      */
-    private void setListenerForPlayModule(){
+    private void initForPlayModule(){
         priorMusic.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                super.mouseClicked(e);
+                if (e.getButton() == MouseEvent.BUTTON1){
+                    playPriorMusic();
+                }
             }
         });
         play_pause.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                super.mouseClicked(e);
+                if (e.getButton() == MouseEvent.BUTTON1){
+                    // TODO: 2018/2/23 线程中断以
+                }
             }
         });
         nextMusic.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                super.mouseClicked(e);
+                if (e.getButton() == MouseEvent.BUTTON1){
+                    playNextMusic();
+                }
             }
         });
         // TODO: 2018/2/21 进度条的监听器
         playMode.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED){
-//                /* 选择顺序播放时 */
-//                if (playMode.getSelectedIndex() == 0 && MusicPlayer.currentPlayMode != 0){
-//                    MusicPlayer.currentPlayMode = 0;
-//                }
-//                /* 选择随机播放时 */
-//                else if (playMode.getSelectedIndex() == 1 && MusicPlayer.currentPlayMode != 1){
-//                    MusicPlayer.currentPlayMode = 1;
-//                }
-//                /* 选择单曲循环时 */
-//                else if (playMode.getSelectedIndex() == 2 && MusicPlayer.currentPlayMode != 2){
-//                    MusicPlayer.currentPlayMode = 2;
-//                }
+                /* 选择顺序播放时 */
+                if (playMode.getSelectedIndex() == 0 && MusicPlayer.currentPlayMode != 0){
+                    MusicPlayer.currentPlayMode = 0;
+                }
+                /* 选择随机播放时 */
+                else if (playMode.getSelectedIndex() == 1 && MusicPlayer.currentPlayMode != 1){
+                    MusicPlayer.currentPlayMode = 1;
+                }
+                /* 选择单曲循环时 */
+                else if (playMode.getSelectedIndex() == 2 && MusicPlayer.currentPlayMode != 2){
+                    MusicPlayer.currentPlayMode = 2;
+                }
+                System.out.println(MusicPlayer.currentPlayMode);
             }
         });
     }
@@ -335,7 +463,7 @@ public class CloudMusic extends JFrame{
     /**
      * 为titleBar设定监听器
      */
-    private void setListenerForTitleBar(){
+    private void initForTitleBar(){
         /* 启动mini模式 */
         miniMode.addMouseListener(new MouseAdapter() {
             @Override
@@ -404,4 +532,145 @@ public class CloudMusic extends JFrame{
     public static CloudMusic getCloudMusic(){
         return new CloudMusic();
     }
+
+    /**
+     * 给定的是一个目录，则递归的将目录下的所有MP3文件添加到指定链表;
+     * 给定的是单独的文件，则仅将这一个文件添加到指定链表
+     * @param file 给定的文件
+     * @param currentOperationList 乐曲将被添加到的链表
+     *
+     */
+    private void addSongs(File file, MusicList currentOperationList){
+        //为普通文件时
+        if (!file.isDirectory()){
+            //解码成功且链表中不存在这首乐曲则添加到链表
+            String[] musicInfo = Music.setMusicInfo(file.getAbsolutePath());
+            if (musicInfo != null) {
+                Music newMusic = new Music(musicInfo);
+                MusicNode newNode = new MusicNode(newMusic);
+                if (!currentOperationList.contains(newNode)){
+                    //当且仅当是全新的元素时才添加到链表
+                    currentOperationList.addSong(newNode);
+                    isMusicListUpdate = true;
+                }
+            }
+        }
+        //当为目录时
+        else {
+            File[] files = file.listFiles(pathname -> {
+                //当为MP3文件或者是目录则允许
+                return pathname.isDirectory() || pathname.getAbsolutePath().endsWith(".mp3") ||pathname.getAbsolutePath().endsWith(".MP3");
+            });
+
+            if (files != null){
+                for (File file1 : files) {
+                    addSongs(file1, currentOperationList);
+                }
+            }
+        }
+
+    }
+
+
+    /**
+     * 播放当前乐曲的上一首歌
+     */
+    public void playPriorMusic(){
+        //将开始按钮设定为暂停
+        // TODO: 2018/2/23 将开始按钮设定为暂停
+        //获取当前乐曲的上一首
+        MusicNode node = MusicPlayer.getPriorMusic();
+
+        //尽量确保将要播放的MusicNode不为空
+        try{
+            while (node.music == null){
+                node = MusicPlayer.getPriorMusic();
+            }
+        }catch (NullPointerException ex){
+            node = MusicPlayer.currentMusicList.getFirstMusic();
+        }
+
+        MusicPlayer.currentMusicNode = node;
+
+        if (!CloudMusicThreadManager.playMusic.isAlive()){
+            CloudMusicThreadManager.playMusic.start();
+        }
+        else {
+            try {
+                EnjoyYourMusic.buffer.close();
+                EnjoyYourMusic.buffer = null;
+                isAutomaticPlay = false;
+            } catch (IOException ex) {
+                //do nothing
+                //只是为了引发播放线程终止播放当前乐曲并播放选中的歌
+            }
+        }
+    }
+
+
+    /**
+     * 播放当前乐曲的下一首歌
+     */
+    public void playNextMusic(){
+        // TODO: 2018/2/23 将开始按钮设定为暂停
+        //获取当前乐曲的下一首
+        MusicNode node = MusicPlayer.getNextMusic();
+
+        try{
+            while (node.music == null){
+                node = MusicPlayer.getNextMusic();
+            }
+        }catch (NullPointerException ex){
+            node = MusicPlayer.currentMusicList.getFirstMusic();
+        }
+
+        MusicPlayer.currentMusicNode = node;
+
+        if (!CloudMusicThreadManager.playMusic.isAlive()){
+            CloudMusicThreadManager.playMusic.start();
+        }
+        else {
+            try {
+                EnjoyYourMusic.buffer.close();
+                EnjoyYourMusic.buffer = null;
+                isAutomaticPlay = false;
+            } catch (IOException ex) {
+                //do nothing
+                //只是为了引发播放线程终止播放当前乐曲并播放选中的歌
+            }
+        }
+    }
+
+    @Override
+    public void run() {
+        //初始化CloudMusic
+        cloudMusic = getCloudMusic();
+        //显示播放器主界面
+        cloudMusic.setVisible(true);
+    }
+}
+
+final class CloudMusicThreadManager{
+    /**
+     * 播放乐曲线程
+     */
+    public final static Thread playMusic = new Thread(() -> {
+        while (true){
+            //为系统托盘和miniCloudMusic和CloudMusic的乐曲基本信息文本框设定提示文本.显示当前播放的乐曲
+            String toolTipText = MusicPlayer.getCurrentMusicInfo();
+            CloudMusicTray.tray.trayIcon.setToolTip(toolTipText);
+            CloudMusic.cloudMusic.musicInfo.setText(toolTipText);
+            MiniCloudMusic.miniCloudMusic.musicInfo.setText(toolTipText);
+            MiniCloudMusic.miniCloudMusic.musicInfo.setToolTipText(toolTipText);
+            EnjoyYourMusic.play(MusicPlayer.currentMusicNode);
+            //自动连播
+            if (CloudMusic.isAutomaticPlay){
+                //非单曲循环时才调用getNext
+                if (MusicPlayer.currentPlayMode != PlayMode.Mode_Loop){
+                    MusicPlayer.currentMusicNode = MusicPlayer.getNextMusic();
+                }
+            }
+            CloudMusic.isAutomaticPlay = true;
+        }
+    });
 }

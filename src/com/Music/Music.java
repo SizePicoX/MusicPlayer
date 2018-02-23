@@ -89,4 +89,9 @@ public class Music implements Serializable{
     public String getMp3FilePath() {
         return mp3FilePath;
     }
+
+    public boolean isSame(Music selectedMusic){
+        return SongName.equals(selectedMusic.SongName) && Artist.equals(selectedMusic.Artist) &&
+                Album.equals(selectedMusic.Album) && SongTime.equals(selectedMusic.SongTime);
+    }
 }

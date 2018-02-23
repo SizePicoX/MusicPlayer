@@ -6,6 +6,7 @@ import com.MusicPlayer;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 
 
 /**
@@ -25,7 +26,7 @@ public class MiniCloudMusic extends JFrame {
     private JButton close;
     private JButton enlarge;
     /* 其他组件 */
-    private JTextArea musicInfo;
+    public JTextArea musicInfo;
     /**
      * 拖动MiniCloudMusic相关字段
      * 记录下拖动组件时，鼠标相对于Frame的位置
@@ -49,7 +50,6 @@ public class MiniCloudMusic extends JFrame {
 
         /* 为MiniCloudMusic设定UI */
         setUI();
-
 
         /* 为Frame设定拖拽 */
         setDraggable(this);
@@ -135,7 +135,7 @@ public class MiniCloudMusic extends JFrame {
         priorMusic.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-
+                CloudMusic.cloudMusic.playPriorMusic();
             }
         });
 
@@ -149,13 +149,13 @@ public class MiniCloudMusic extends JFrame {
                     // TODO: 2018/2/17 当然，这不是GUI要去处理的事情
                     MusicNode currentMusicNode = MusicPlayer.currentMusicNode;
                     if (currentMusicNode.music.getMp3FilePath() != null){
-                        EnjoyYourMusic.play(currentMusicNode);
+                        //EnjoyYourMusic.play(currentMusicNode);
                         play.setSelected(true);
                     }
                 }
                 /* 暂停播放 */
                 else {
-                    MusicPlayer.stop();
+                    MusicPlayer.pause();
                     play.setSelected(false);
                 }
             }
@@ -165,7 +165,7 @@ public class MiniCloudMusic extends JFrame {
         nextMusic.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-
+                CloudMusic.cloudMusic.playNextMusic();
             }
         });
     }

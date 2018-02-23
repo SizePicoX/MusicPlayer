@@ -54,7 +54,10 @@ public class AddList extends JDialog {
      * buttonOK的监听器
      */
     private void onOK() {
-        // add your code here
+//        MusicList newList = new MusicList();
+//        newList.setInitFileName(textArea.getText());
+        //将新添加的歌单添加到GUI中以显示
+
         dispose();
     }
 
@@ -69,13 +72,6 @@ public class AddList extends JDialog {
         /* 设置图标 */
         ImageIcon icon = new ImageIcon("src\\icon\\tipsIcon.png");
         setIconImage(icon.getImage());
-        /* 设定LookAndFell */
-        String lookAndFeel = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
-        try {
-            UIManager.setLookAndFeel(lookAndFeel);
-        } catch (ClassNotFoundException | InstantiationException | UnsupportedLookAndFeelException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
 
         MouseAdapter listener = new MouseAdapter() {
             @Override

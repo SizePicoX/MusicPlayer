@@ -160,6 +160,7 @@
               <focusable value="false"/>
               <font name="DialogInput" style="3"/>
               <foreground color="-1"/>
+              <lineWrap value="true"/>
               <maximumSize width="123" height="27"/>
               <preferredSize width="96" height="27"/>
               <rows value="1"/>

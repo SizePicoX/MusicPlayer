@@ -7,6 +7,7 @@ import com.MusicPlayer;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 
 
 /**
@@ -16,7 +17,8 @@ public class CloudMusicTray {
 
     private  JPopupMenu menu;//弹出式菜单
 
-    private  JLabel label;//替代方案.目前无法实现当菜单失去focus时自动消失.故替代为当点击label时消失
+    private      JLabel label;//替代方案.目前无法实现当菜单失去focus时自动消失.故替代为当点击label时消失
+    public   TrayIcon trayIcon;//系统托盘图标的实例.为了能够动态的修改显示文本
     private  JComboBox<String> playMode;//播放模式.包括顺序播放，随机播放和单曲循环
     private  JComboBox<String> frameMode;//播放器窗体模式.可以是完整模式或者迷你模式
     private  JMenuItem play_pause;//播放，暂停
@@ -121,10 +123,9 @@ public class CloudMusicTray {
         });
 
         //设置系统托盘图标
-        // TODO: 2018/2/15  设定CloudMusic的系统托盘图标提示
-        //String tooltip = MusicPlayer.getCurrentMusicInfo();//获取当前播放乐曲信息.默认返回"demo"
+        String tooltip = MusicPlayer.getCurrentMusicInfo();
         ImageIcon icon = new ImageIcon("src\\icon\\formatTrayIcon.png");
-        TrayIcon trayIcon = new TrayIcon(icon.getImage(), "CloudMusic");
+        trayIcon = new TrayIcon(icon.getImage(), tooltip);
         /* 托盘图标监听器 */
         trayIcon.addMouseListener(new MouseAdapter() {
             @Override
@@ -265,7 +266,7 @@ public class CloudMusicTray {
                         MusicNode currentMusicNode = MusicPlayer.currentMusicNode;
                         if (currentMusicNode.music.getMp3FilePath() != null){
                             // TODO: 2018/2/18 同时，play方法在无法播放时候报错或者放别的歌都可以
-                            EnjoyYourMusic.play(currentMusicNode);
+                            //EnjoyYourMusic.play(currentMusicNode);
                             play_pause.setIcon(new ImageIcon("src\\icon\\pauseTrayIcon.png"));
                             play_pause.setText("暂停");
                             play_pause.setSelected(true);
@@ -273,7 +274,7 @@ public class CloudMusicTray {
                     }
                     //暂停
                     else {
-                        MusicPlayer.stop();
+                        MusicPlayer.pause();
                         play_pause.setIcon(new ImageIcon("src\\icon\\playTrayIcon.png"));
                         play_pause.setText("播放");
                         play_pause.setSelected(false);
@@ -289,6 +290,7 @@ public class CloudMusicTray {
                 if (e.getButton() == MouseEvent.BUTTON1){
                     priorMusic.setBackground(color);
                     menu.setVisible(false);
+                    CloudMusic.cloudMusic.playPriorMusic();
                 }
             }
         });
@@ -298,6 +300,7 @@ public class CloudMusicTray {
                 if (e.getButton() == MouseEvent.BUTTON1){
                     nextMusic.setBackground(color);
                     menu.setVisible(false);
+                    CloudMusic.cloudMusic.playNextMusic();
                 }
             }
         });
@@ -307,7 +310,6 @@ public class CloudMusicTray {
                 if (e.getButton() == MouseEvent.BUTTON1){
                     // TODO: 2018/2/16 MusicPlayer的Save方法
                     //MusicPlayer.Save();
-                    // TODO: 2018/2/16 这种方法真的能终止所有线程吗？
                     System.exit(0);
                 }
             }

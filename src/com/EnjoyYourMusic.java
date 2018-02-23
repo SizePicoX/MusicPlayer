@@ -11,13 +11,7 @@ import java.io.IOException;
  */
 public class EnjoyYourMusic {
 
-
-    /**
-     * 当前播放器正在播放的音乐
-     */
-    private static MusicNode currentMusicNode = null;
-
-
+    public static BufferedInputStream buffer;
     /**
      * 不允许创建MusicPlayer的对象
      */
@@ -29,14 +23,11 @@ public class EnjoyYourMusic {
     /**
      * 播放MP3音频
      */
-    private static void playMP3() throws JavaLayerException {
-        try {
-            BufferedInputStream buffer = new BufferedInputStream(new FileInputStream(currentMusicNode.music.getMp3FilePath()));
-            javazoom.jl.player.Player player = new javazoom.jl.player.Player(buffer);
-            player.play();
-        }catch(IOException ex){
-            ex.printStackTrace();
-        }
+    private static void playMP3(MusicNode currentMusicNode)throws IOException,JavaLayerException{
+        buffer = new BufferedInputStream(new FileInputStream(currentMusicNode.music.getMp3FilePath()));
+        javazoom.jl.player.Player player = new javazoom.jl.player.Player(buffer);
+        player.play();
+        buffer.close();
     }
 
     /**
@@ -57,14 +48,6 @@ public class EnjoyYourMusic {
      * 开始听歌吧!!!
      */
     public static void play(MusicNode selectedMusicNode){
-        // TODO: 2018/2/17 该方法必须要能够处理播放断点.应该时使用线程的wait方法相关来解决
-        //当播放器并没有放歌
-        if (currentMusicNode == null){
-            EnjoyYourMusic.currentMusicNode = selectedMusicNode;
-        }
-        else {
-
-        }
         //暂存选定文件路径
         String str = selectedMusicNode.music.getMp3FilePath();
         //得到选定文件类型在str中的下标
@@ -74,9 +57,9 @@ public class EnjoyYourMusic {
         //如果文件是MP3文件
         if (TYPE.equalsIgnoreCase("mp3")){
             try {
-                EnjoyYourMusic.playMP3();
-            }catch (JavaLayerException ex){
-                ex.printStackTrace();
+                EnjoyYourMusic.playMP3(selectedMusicNode);
+            } catch (IOException | JavaLayerException e) {
+                //do nothing
             }
         }
         //如果是WAV文件

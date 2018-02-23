@@ -7,6 +7,10 @@ package Error;
 public class InitException extends RuntimeException implements InitError{
     private int errorCode;
 
+    public InitException(){
+
+    }
+
     /**建立一个初始化异常
      * @param errorMessage 错误提示信息
      * @param errorCode  对应的错误码
