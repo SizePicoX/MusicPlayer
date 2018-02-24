@@ -282,42 +282,6 @@ import java.io.*;
         //当删除源文件失败时，才返回false.链表的删除不可能失败
         return result;
     }
-    /**
-     * @param subStr 待搜索的字符串，可以是歌曲名字或歌手或专辑中的任意连续字符
-     *               返回采用KMP算法,遍历链表得到的匹配项
-     * P.S.边计算边调用GU的显示程序，在GUI中显示匹配项(其他不匹配的不显示，当用户点击之后，再重新显示)
-     */
-    public void searchSong(String subStr) {
-
-        MusicNode node = FirstMusic;
-        int count = 1;//从列表第一首歌开始搜索
-        boolean flag = true;//如果没有一首歌匹配，则为true
-        String str;//待检索的字符串，包括歌曲名，歌手，专辑
-        while (count <= sum){
-            str =  node.music.getSongName() + node.music.getArtist() + node.music.getAlbum();
-            //P.S.待搜索的子串需要去掉前导空白
-            if (Implements.KMP(str,subStr.trim())){
-                //此时匹配，应当调用GUI将被匹配到的MusicNode显示出来
-                if (count == 1) flag = false; //只会对flag访问一次
-
-                /*--------------------------------------------------------------------------------------------------------------
-                  这里调用GUI的显示程序
-                --------------------------------------------------------------------------------------------------------------*/
-
-            }
-            node = node.next;
-            ++count;
-        }
-        if (flag){
-            //显示“无结果”
-
-            /*--------------------------------------------------------------------------------------------------------------
-             这里调用GUI的显示程序
-            --------------------------------------------------------------------------------------------------------------*/
-
-        }
-    }
-
     @Override
     public String toString() {
         return initFileName;
@@ -336,5 +300,20 @@ import java.io.*;
             --cnt;
         }
         return false;
+    }
+
+    public int getIndexOfCurrentMusicNode(MusicNode currentMusicNode){
+        if (currentMusicNode != null && sum != 0){
+            //计数器，以记录currentMusicNode在链表中是第几个元素
+            int cnt = 0;
+            //从当前列表的第一首乐曲开始检索
+            MusicNode node = getFirstMusic();
+            while (!currentMusicNode.equals(node)){
+                node = node.next;
+                ++cnt;
+            }
+            return  cnt;
+        }
+        else return -1;
     }
 }

@@ -51,51 +51,6 @@ public class Implements {
         return (-1) * result;
     }
     /**
-     * @param str 被搜索的主串
-     * @param subStr 希望查找的子串
-     * @return 当子串存在于主串时，返回true
-     */
-    public static boolean KMP(String str,String subStr){
-        char[] strArr = str.toCharArray();
-        char[] subStrArr = subStr.toCharArray();
-        int[] Next = new int[subStrArr.length];
-        //调用getNext方法得到Next数组
-        getNext(subStrArr,Next);
-        //开始KMP
-        int i = 0; int j = 0;//分别指向主串和子串
-        while (i < strArr.length && j < subStrArr.length){
-            if (j == -1 || strArr[i] == subStrArr[j]){
-                ++i;
-                ++j;
-            }
-            //当子串在j位置不匹配时，重新指向新的位置
-            else {
-                j = Next[j];
-            }
-        }
-        //当子串不在主串内时，返回false
-        return j == subStrArr.length;
-    }
-    /**
-     * @param subStrArr 所查询的子字符串
-     * @param Next 输出的Next数组
-     *             P.S.仅在KMP算法内被调用
-     */
-    private static void getNext(char[] subStrArr,int[] Next){
-        int i = -1;  int j = 0;//分别表示主串制作==指针和子串指针
-        Next[0] = -1;//代表不存在下一个指针位置
-        while (j < subStrArr.length - 1){
-            if (i == 0 || subStrArr[i] == subStrArr[j]){
-                ++i;
-                ++j;
-                Next[i] = j;
-            }
-            else
-                j = Next[j];
-        }
-    }
-
-    /**
      * 删除指定文件夹下所有非文件夹的文件
      * @param selectedFolder  指定的文件夹
      */

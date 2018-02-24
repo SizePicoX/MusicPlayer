@@ -15,6 +15,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class CloudMusic extends JFrame implements Runnable{
     /* CloudMusic根面板 */
@@ -61,7 +62,7 @@ public class CloudMusic extends JFrame implements Runnable{
 
     //GUI主面板所管理的JList的数据模式
     private static DefaultListModel<String> musicListModel;
-    private static DefaultListModel<String> currentMusicListListModel;
+    private static DefaultListModel<String> currentMusicListModel;
 
     /* 拖动CloudMusic相关 */
     private static Point pre_point;
@@ -89,9 +90,19 @@ public class CloudMusic extends JFrame implements Runnable{
     private static boolean isMusicListUpdate = false;
 
     /**
-     * 当前正在操作的音乐播放列表.
+     * 当前正在操作的音乐播放列表.一定是所有播放列表中的一个.
      */
     private static MusicList currentOperationList;
+
+    /**
+     * 由搜索方法的得到的搜索值
+     */
+    private static ArrayList<MusicNode> scanMusicNodes;
+
+    /**
+     * 标记检索指定乐曲是否成功
+     */
+    private boolean isSearchSuccess = false;
 
     /**
      * 标记播放线程是采用自动连播还是根据给定的MusicNode来播放
@@ -276,8 +287,8 @@ public class CloudMusic extends JFrame implements Runnable{
      */
     private void initForMusic(){
         //初始化currentMusicList
-        currentMusicListListModel = new DefaultListModel<>();
-        currentMusicList.setModel(currentMusicListListModel);
+        currentMusicListModel = new DefaultListModel<>();
+        currentMusicList.setModel(currentMusicListModel);
         //将currentMusicList添加到ScrollPane
         currentMusicListScrollPane.setViewportView(currentMusicList);
         //添加乐曲
@@ -312,13 +323,13 @@ public class CloudMusic extends JFrame implements Runnable{
                         //更新GUI的操作必须在SwingUtilities线程里面进行
                         //链表被更新时，才更新GUI
                         if (isMusicListUpdate) {
-                            currentMusicListListModel.clear();
+                            currentMusicListModel.clear();
                             SwingUtilities.invokeLater(() -> {
                                 int cnt = currentOperationList.sum;
                                 if (cnt != 0) {
                                     MusicNode node = currentOperationList.getFirstMusic();
                                     while (cnt > 0) {
-                                        currentMusicListListModel.addElement(Implements.renderer(node.toString()));
+                                        currentMusicListModel.addElement(Implements.renderer(node.toString()));
                                         node = node.next;
                                         --cnt;
                                     }
@@ -341,22 +352,70 @@ public class CloudMusic extends JFrame implements Runnable{
         //搜索乐曲
         searchSongs.addKeyListener(new KeyAdapter() {
             @Override
-            public void keyTyped(KeyEvent e) {
+            public void keyReleased(KeyEvent e) {
                 //每次键入有效字符时则搜索乐曲
                 String str = e.paramString().split("[,]")[3];
+                String detectedText = searchSongs.getText();
                 //当为有效字符时
-                if ((!str.contains(" ")) && (!str.contains("Backspace")) && (!str.contains("Enter")) && (!str.contains("Delete"))){
+                if ((!str.contains(" "))  && (!str.contains("Enter")) && (!str.contains("Delete"))){
                     isValueEffective = true;
-                    // TODO: 2018/2/21 开始检测
+                    if (currentOperationList.sum != 0){
+                        scanMusicNodes = new ArrayList<>(15);
+                        currentMusicListModel.clear();
+                        //开始搜索并更新GUI
+                        //检索到了对应的MusicNode且搜索框非空则更新GUI
+                        //当搜索框为空时，由下面的检测搜索框为空的方法更新GUI
+                        if (!searchSongs.getText().equals("")){
+                            SwingUtilities.invokeLater(() -> {
+                                int cnt = currentOperationList.sum;
+                                MusicNode node = currentOperationList.getFirstMusic();
+                                String[] musicScanInfo = new String[3];
+                                while (cnt > 0){
+                                    musicScanInfo[0] = node.music.getSongName();
+                                    musicScanInfo[1] = node.music.getArtist();
+                                    musicScanInfo[2] = node.music.getAlbum();
+                                    for (int i = 0; i < 2 ; ++i){
+                                        if (musicScanInfo[i].contains(detectedText)){
+                                            currentMusicListModel.addElement(Implements.renderer(node.toString()));
+                                            scanMusicNodes.add(node);
+                                            //标记当前检索成功
+                                            isSearchSuccess = true;
+                                            break;
+                                        }
+                                    }
+                                    node = node.next;
+                                    --cnt;
+                                }
+                                if (!isSearchSuccess) {
+                                    //检索失败时，动态数组置空
+                                    scanMusicNodes = null;
+                                }
+                            });
+                        }
+                    }
                 }
                 else if (!isValueEffective){
                     searchSongs.setText("");
                 }
-                //当退格时,检测文本框是否被清空
-                else if (str.contains("Backspace")){
-                    if (searchSongs.getText().equals("")){
-                        isValueEffective = false;
-                        searchSongs.setText("搜索乐曲");
+                //每次键入数据之后，检测文本框是否被清空
+                if (searchSongs.getText().equals("")){
+                    isValueEffective = false;
+                    //here
+                    //当搜索框里面没有用户输入数据时，退出搜索模式.同时将占用的资源释放
+                    isSearchSuccess = false;
+                    scanMusicNodes = null;
+                    //重绘GUI
+                    if (currentOperationList.sum != 0){
+                        SwingUtilities.invokeLater(() -> {
+                            currentMusicListModel.clear();
+                            MusicNode node = currentOperationList.getFirstMusic();
+                            int cnt = currentOperationList.sum;
+                            while (cnt > 0){
+                                currentMusicListModel.addElement(Implements.renderer(node.toString()));
+                                node = node.next;
+                                --cnt;
+                            }
+                        });
                     }
                 }
             }
@@ -379,6 +438,24 @@ public class CloudMusic extends JFrame implements Runnable{
             @Override
             public void mouseClicked(MouseEvent e) {
                 searchSongs.setText("搜索乐曲");
+                isValueEffective = false;
+                //here
+                //当搜索框里面没有用户输入数据时，退出搜索模式.同时将占用的资源释放
+                isSearchSuccess = false;
+                scanMusicNodes = null;
+                //重绘GUI
+                if (currentOperationList.sum != 0){
+                    SwingUtilities.invokeLater(() -> {
+                        currentMusicListModel.clear();
+                        MusicNode node = currentOperationList.getFirstMusic();
+                        int cnt = currentOperationList.sum;
+                        while (cnt > 0){
+                            currentMusicListModel.addElement(Implements.renderer(node.toString()));
+                            node = node.next;
+                            --cnt;
+                        }
+                    });
+                }
             }
         });
         //currentMusicList的监听器.双击以播放乐曲
@@ -388,11 +465,28 @@ public class CloudMusic extends JFrame implements Runnable{
                 //使用鼠标左键双击时
                 if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2){
                     JList list = (JList) e.getSource();
+                    //当处于检索模式下，使用数组scanMusicNodes里面的数据来播放
+                    if (isSearchSuccess){
+                        //设定当前正在播放的乐曲
+                        MusicPlayer.currentMusicNode = scanMusicNodes.get(list.getSelectedIndex());
+                        if (!CloudMusicThreadManager.playMusic.isAlive()){
+                            CloudMusicThreadManager.playMusic.start();
+                        }
+                        else {
+                            try {
+                                EnjoyYourMusic.buffer.close();
+                                EnjoyYourMusic.buffer = null;
+                                isAutomaticPlay = false;
+                            } catch (IOException ex) {
+                                //do nothing
+                                //只是为了引发播放线程终止播放当前乐曲并播放选中的歌
+                            }
+                        }
+                    }
                     //当双击与当前播放乐曲不同的乐曲时才播放
-                    if (MusicPlayer.getIndexOfCurrentMusicNode() != list.getSelectedIndex()){
+                    else if (MusicPlayer.getIndexOfCurrentMusicNode() != list.getSelectedIndex()){
                         //设定当前正在播放的乐曲
                         MusicPlayer.setCurrentMusicNode(list.getSelectedIndex());
-
                         if (!CloudMusicThreadManager.playMusic.isAlive()){
                             CloudMusicThreadManager.playMusic.start();
                         }
@@ -429,6 +523,7 @@ public class CloudMusic extends JFrame implements Runnable{
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1){
                     // TODO: 2018/2/23 线程中断以
+                    
                 }
             }
         });
