@@ -1,12 +1,10 @@
 package CloudMusicGUI;
 
-import com.EnjoyYourMusic;
-import com.List.MusicNode;
 import com.MusicPlayer;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.IOException;
 
 
 /**
@@ -21,7 +19,7 @@ public class MiniCloudMusic extends JFrame {
     private  JPanel musicInfoBar;
     /* 按钮 */
     private JButton priorMusic;
-    private JButton play;
+    public JButton play_pause;
     private JButton nextMusic;
     private JButton close;
     private JButton enlarge;
@@ -55,7 +53,7 @@ public class MiniCloudMusic extends JFrame {
         setDraggable(this);
         /* JButton的数组 */
         /* 为所有的按钮添加监听器，使之可以拖拽 */
-        JButton[] buttons = {priorMusic,play,nextMusic,close,enlarge};
+        JButton[] buttons = {priorMusic, play_pause,nextMusic,close,enlarge};
         for (JButton button : buttons){
             setDraggable(button);
         }
@@ -90,6 +88,8 @@ public class MiniCloudMusic extends JFrame {
         } catch (ClassNotFoundException | InstantiationException | UnsupportedLookAndFeelException | IllegalAccessException e) {
             e.printStackTrace();
         }
+        //初始化乐曲基本信息文本
+        musicInfo.setText(MusicPlayer.getCurrentMusicInfo());
     }
     /**
      * 在关闭边框的情况下，使得MiniCloudMusic可拖拽
@@ -139,25 +139,11 @@ public class MiniCloudMusic extends JFrame {
             }
         });
 
-        /* play */
-        play.addMouseListener(new MouseAdapter() {
+        /* play_pause */
+        play_pause.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                /* 播放乐曲 */
-                if (!play.isSelected()){
-                    // TODO: 2018/2/17 这里存在问题.当播放器初始化时和放了一会然后暂停然后又继续播放时怎么办?
-                    // TODO: 2018/2/17 当然，这不是GUI要去处理的事情
-                    MusicNode currentMusicNode = MusicPlayer.currentMusicNode;
-                    if (currentMusicNode.music.getMp3FilePath() != null){
-                        //EnjoyYourMusic.play(currentMusicNode);
-                        play.setSelected(true);
-                    }
-                }
-                /* 暂停播放 */
-                else {
-                    MusicPlayer.pause();
-                    play.setSelected(false);
-                }
+                CloudMusic.cloudMusic.SET_PLAY_OR_PAUSE();
             }
         });
 
@@ -187,6 +173,8 @@ public class MiniCloudMusic extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 setVisible(false);
+                //更改系统托盘对应的显示值
+                CloudMusicTray.tray.frameMode.setSelectedIndex(0);
                 CloudMusic.cloudMusic.setVisible(true);
             }
         });

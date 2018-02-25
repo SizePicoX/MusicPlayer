@@ -53,9 +53,11 @@ public class MusicNode implements Serializable{
     }
 
     /**
-     * @return 正在播放的乐曲的基本信息.格式为： 乐曲名 - 歌手
+     * @return 当前乐曲的时长.以秒来计算
      */
-    public String getMusicInfo(){
-        return music.getSongName() + " - " + music.getArtist();
+    public int getSongTime(){
+        String[] str = music.getSongTime().split(":");
+        return Integer.parseInt(str[0]) * 60 + Integer.parseInt(str[1]);
     }
+
 }

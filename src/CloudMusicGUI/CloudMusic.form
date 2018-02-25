@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="CloudMusicGUI.CloudMusic">
   <grid id="27dc6" binding="myPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="20" y="20" width="819" height="418"/>
+      <xy x="20" y="20" width="824" height="418"/>
     </constraints>
     <properties>
       <background color="-16777216"/>
@@ -167,7 +167,7 @@
                       <font name="DialogInput" style="2"/>
                       <margin top="3" left="21" bottom="3" right="21"/>
                       <text value="添加乐曲"/>
-                      <toolTipText value="将自动扫描您勾选的目录，文件增删实时同步"/>
+                      <toolTipText value="将自动扫描您选择的目录里的MP3文件"/>
                     </properties>
                   </component>
                   <vspacer id="5d639">
@@ -203,11 +203,11 @@
                       <grid row="1" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
-                      <borderPainted value="false"/>
+                      <borderPainted value="true"/>
                       <focusPainted value="false"/>
-                      <icon value="icon/cleanSearchField.png"/>
-                      <margin top="0" left="0" bottom="0" right="0"/>
-                      <text value=""/>
+                      <font name="DialogInput" style="2"/>
+                      <margin top="3" left="21" bottom="3" right="21"/>
+                      <text value="清空"/>
                     </properties>
                   </component>
                 </children>
@@ -237,7 +237,7 @@
           </grid>
         </children>
       </grid>
-      <grid id="4da97" binding="playModule" layout-manager="GridLayoutManager" row-count="1" column-count="5" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="4da97" binding="playModule" layout-manager="GridLayoutManager" row-count="1" column-count="7" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints border-constraint="South"/>
         <properties>
@@ -288,7 +288,7 @@
           </component>
           <component id="5306b" class="javax.swing.JComboBox" binding="playMode">
             <constraints>
-              <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <background color="-4473925"/>
@@ -303,19 +303,38 @@
           </component>
           <component id="6515b" class="javax.swing.JSlider" binding="currentPlayTime">
             <constraints>
-              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <background color="-10241793"/>
+              <maximum value="0"/>
               <minorTickSpacing value="0"/>
               <opaque value="false"/>
               <paintLabels value="false"/>
-              <paintTicks value="false"/>
+              <paintTicks value="true"/>
               <paintTrack value="true"/>
               <requestFocusEnabled value="true"/>
               <snapToTicks value="false"/>
               <value value="0"/>
               <valueIsAdjusting value="false"/>
+            </properties>
+          </component>
+          <component id="3551f" class="javax.swing.JLabel" binding="songTimeLabel">
+            <constraints>
+              <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <font name="DialogInput" style="2"/>
+              <text value="-:-"/>
+            </properties>
+          </component>
+          <component id="8636e" class="javax.swing.JLabel" binding="currentPlayTimeLabel">
+            <constraints>
+              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <font name="DialogInput" style="2"/>
+              <text value="0:0"/>
             </properties>
           </component>
         </children>

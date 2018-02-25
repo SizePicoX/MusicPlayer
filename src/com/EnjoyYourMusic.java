@@ -1,5 +1,6 @@
 package com;
 
+import CloudMusicGUI.CloudMusic;
 import com.List.MusicNode;
 import javazoom.jl.decoder.JavaLayerException;
 import java.io.BufferedInputStream;
@@ -26,6 +27,8 @@ public class EnjoyYourMusic {
     private static void playMP3(MusicNode currentMusicNode)throws IOException,JavaLayerException{
         buffer = new BufferedInputStream(new FileInputStream(currentMusicNode.music.getMp3FilePath()));
         javazoom.jl.player.Player player = new javazoom.jl.player.Player(buffer);
+        //获取当前播放时间
+        CloudMusic.currentTime = System.currentTimeMillis();
         player.play();
         buffer.close();
     }
@@ -59,7 +62,8 @@ public class EnjoyYourMusic {
             try {
                 EnjoyYourMusic.playMP3(selectedMusicNode);
             } catch (IOException | JavaLayerException e) {
-                //do nothing
+                //播放标志置false
+                CloudMusic.IS_PLAY_OR_PAUSE = false;
             }
         }
         //如果是WAV文件
@@ -70,5 +74,21 @@ public class EnjoyYourMusic {
         else {
             EnjoyYourMusic.playWMA();
         }
+    }
+
+
+    /**
+     *仅供测试使用.
+     * 输入MP3文件路劲以播放
+     */
+    public static void test (String filePath) throws IOException,JavaLayerException{
+        long a = System.currentTimeMillis();
+        buffer = new BufferedInputStream(new FileInputStream(filePath));
+        javazoom.jl.player.Player player = new javazoom.jl.player.Player(buffer);
+        long b = System.currentTimeMillis();
+        //初始化播放器所需要的时间
+        System.out.println(b - a);
+        player.play();
+        buffer.close();
     }
 }

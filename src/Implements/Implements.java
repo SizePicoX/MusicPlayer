@@ -4,6 +4,7 @@ package Implements;
 import com.List.MusicList;
 import com.List.MusicNode;
 import com.Music.Music;
+import com.MusicPlayer;
 
 import javax.swing.filechooser.FileFilter;
 import java.io.*;
@@ -175,5 +176,27 @@ public class Implements {
         }
 
         return text[0] + text[1] + text[2] + text[3];
+    }
+
+    /**
+     * 在播放前,保证MusicPlay.currentMusicNode指向一个可播放的文件
+     * @param node 应当是MusicPlay.currentMusicNode
+     * @return 经处理后的指向可播放文件的MusicNode
+     */
+    public static MusicNode ensureNotNull(MusicNode node){
+        try {
+            //此时处理node不为空但可能指向一个不可播放的文件的情况
+            String str = node.music.getMp3FilePath();
+            //如果不是可播放的MP3文件则继续循环直到找到为止
+            while (!(new File(str).isFile() && (str.endsWith(".mp3") || str.endsWith(".MP3")))){
+                node = MusicPlayer.getNextMusic();
+                str = node.music.getMp3FilePath();
+            }
+            return node;
+        }catch (NullPointerException ex){
+            //此时处理node为空的情况
+            node = MusicPlayer.currentMusicList.getFirstMusic();
+            return ensureNotNull(node);
+        }
     }
 }

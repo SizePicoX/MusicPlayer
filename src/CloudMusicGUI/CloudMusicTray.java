@@ -1,13 +1,10 @@
 package CloudMusicGUI;
 
-import com.EnjoyYourMusic;
-import com.List.MusicNode;
 import com.MusicPlayer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.IOException;
 
 
 /**
@@ -17,11 +14,11 @@ public class CloudMusicTray {
 
     private  JPopupMenu menu;//弹出式菜单
 
-    private      JLabel label;//替代方案.目前无法实现当菜单失去focus时自动消失.故替代为当点击label时消失
+    private  JLabel label;//替代方案.目前无法实现当菜单失去focus时自动消失.故替代为当点击label时消失
     public   TrayIcon trayIcon;//系统托盘图标的实例.为了能够动态的修改显示文本
-    private  JComboBox<String> playMode;//播放模式.包括顺序播放，随机播放和单曲循环
-    private  JComboBox<String> frameMode;//播放器窗体模式.可以是完整模式或者迷你模式
-    private  JMenuItem play_pause;//播放，暂停
+    public   JComboBox<String> playMode;//播放模式.包括顺序播放，随机播放和单曲循环
+    public   JComboBox<String> frameMode;//播放器窗体模式.可以是完整模式或者迷你模式
+    public   JMenuItem play_pause;//播放，暂停
     private  JMenuItem priorMusic;//上一首
     private  JMenuItem nextMusic;//下一首
     private  JMenuItem exit;//退出
@@ -136,6 +133,7 @@ public class CloudMusicTray {
                         MiniCloudMusic.miniCloudMusic.setVisible(false);
                         if (!CloudMusic.cloudMusic.isVisible()){
                             CloudMusic.cloudMusic.setVisible(true);
+                            frameMode.setSelectedIndex(0);
                         }
                     }
                 }
@@ -236,22 +234,23 @@ public class CloudMusicTray {
         });
         playMode.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED){
-                        /* 选择顺序播放时 */
-                    if (playMode.getSelectedIndex() == 0 && MusicPlayer.currentPlayMode != 0){
-                        MusicPlayer.currentPlayMode = 0;
-                        menu.setVisible(false);
-                    }
-                        /* 选择随机播放时 */
-                    else if (playMode.getSelectedIndex() == 1 && MusicPlayer.currentPlayMode != 1){
-                        MusicPlayer.currentPlayMode = 1;
-                        menu.setVisible(false);
-                    }
-                        /* 选择单曲循环时 */
-                    else if (playMode.getSelectedIndex() == 2 && MusicPlayer.currentPlayMode != 2){
-                        MusicPlayer.currentPlayMode = 2;
-                        menu.setVisible(false);
-                    }
+                /* 选择顺序播放时 */
+                if (playMode.getSelectedIndex() == 0 && MusicPlayer.currentPlayMode != 0){
+                    MusicPlayer.currentPlayMode = 0;
+                    CloudMusic.cloudMusic.playMode.setSelectedIndex(0);
+                }
+                /* 选择随机播放时 */
+                else if (playMode.getSelectedIndex() == 1 && MusicPlayer.currentPlayMode != 1){
+                    MusicPlayer.currentPlayMode = 1;
+                    CloudMusic.cloudMusic.playMode.setSelectedIndex(1);
+                }
+                /* 选择单曲循环时 */
+                else if (playMode.getSelectedIndex() == 2 && MusicPlayer.currentPlayMode != 2){
+                    MusicPlayer.currentPlayMode = 2;
+                    CloudMusic.cloudMusic.playMode.setSelectedIndex(2);
+                }
             }
+            menu.setVisible(false);
         });
         /* 播放暂停按钮 */
         play_pause.addMouseListener(new MouseAdapter() {
@@ -259,26 +258,7 @@ public class CloudMusicTray {
             public void mouseClicked(MouseEvent e) {
                 /* 当鼠标左键点击时才视为事件 */
                 if (e.getButton() == MouseEvent.BUTTON1){
-                    //播放
-                    if (!play_pause.isSelected()){
-                        // TODO: 2018/2/17 这里存在问题.当播放器初始化时和放了一会然后暂停然后又继续播放时怎么办?
-                        // TODO: 2018/2/17 当然，这不是GUI要去处理的事情
-                        MusicNode currentMusicNode = MusicPlayer.currentMusicNode;
-                        if (currentMusicNode.music.getMp3FilePath() != null){
-                            // TODO: 2018/2/18 同时，play方法在无法播放时候报错或者放别的歌都可以
-                            //EnjoyYourMusic.play(currentMusicNode);
-                            play_pause.setIcon(new ImageIcon("src\\icon\\pauseTrayIcon.png"));
-                            play_pause.setText("暂停");
-                            play_pause.setSelected(true);
-                        }
-                    }
-                    //暂停
-                    else {
-                        MusicPlayer.pause();
-                        play_pause.setIcon(new ImageIcon("src\\icon\\playTrayIcon.png"));
-                        play_pause.setText("播放");
-                        play_pause.setSelected(false);
-                    }
+                    CloudMusic.cloudMusic.SET_PLAY_OR_PAUSE();
                     play_pause.setBackground(color);
                     menu.setVisible(false);
                 }
