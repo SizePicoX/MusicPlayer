@@ -423,6 +423,7 @@ public class MusicPlayer implements Serializable,PlayMode {
             while (!currentMusicNode.equals(node)){
                 node = node.next;
                 ++cnt;
+                System.out.println(cnt);
             }
             return  cnt;
         }

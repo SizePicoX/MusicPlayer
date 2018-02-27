@@ -12,10 +12,7 @@ public class AddList extends JDialog {
     private JPanel buttonPanel;
     private JLabel label;
 
-    /**
-     * 标记textArea里面是否有有效数据
-     */
-    private static boolean isValueEffective = false;
+    public  String songListName = null;//输入的歌单名字
 
     AddList(Point point) {
 
@@ -54,10 +51,28 @@ public class AddList extends JDialog {
      * buttonOK的监听器
      */
     private void onOK() {
-//        MusicList newList = new MusicList();
-//        newList.setInitFileName(textArea.getText());
-        //将新添加的歌单添加到GUI中以显示
-
+        while (true){
+            //将新添加的歌单添加到GUI中以显示
+            //不允许歌单重名
+            //获取新建的歌单名字
+            String name = textArea.getText();
+            //歌单不为空时，扫描歌单检测是否同名
+            if (!CloudMusic.musicListModel.isEmpty()){
+                int i = 0;
+                for (; i < CloudMusic.musicListModel.getSize() ; ++i){
+                    if (name.equalsIgnoreCase(CloudMusic.musicListModel.get(i))) break;
+                }
+                if (i == CloudMusic.musicListModel.getSize()){
+                    songListName = name;
+                    break;
+                }
+            }
+            //歌单为空时直接添加
+            else {
+                songListName = name;
+                break;
+            }
+        }
         dispose();
     }
 

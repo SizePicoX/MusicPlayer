@@ -3,9 +3,8 @@ package com;
 import CloudMusicGUI.CloudMusic;
 import com.List.MusicNode;
 import javazoom.jl.decoder.JavaLayerException;
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
+
+import java.io.*;
 
 /**
  * enjoy your music!!!
@@ -28,7 +27,20 @@ public class EnjoyYourMusic {
         buffer = new BufferedInputStream(new FileInputStream(currentMusicNode.music.getMp3FilePath()));
         javazoom.jl.player.Player player = new javazoom.jl.player.Player(buffer);
         //获取当前播放时间
-        CloudMusic.currentTime = System.currentTimeMillis();
+        CloudMusic.starTime = System.currentTimeMillis();
+        if (CloudMusic.iSliderDragged){
+            double percent = (CloudMusic.cloudMusic.currentPlayTime.getValue() * 1.0) / (CloudMusic.cloudMusic.currentPlayTime.getMaximum() * 1.0);
+            //计算本次偏移所需要的偏移量
+            //如果是320的比特率的话才能精准的找到偏移位置.这是当前一大不足.
+            String[] songTime = currentMusicNode.music.getSongTime().split(":");
+            int offset = currentMusicNode.music.getID3InfoLength() +
+                    (Integer.parseInt(songTime[0]) * 60 + Integer.parseInt(songTime[1])) * 320 * 1000 / 8;
+            buffer.skip((long)(offset * percent));
+            //重定位startTime
+            CloudMusic.starTime = System.currentTimeMillis() - CloudMusic.cloudMusic.currentPlayTime.getValue() * 1000;
+        }
+        //本次快进结束
+        CloudMusic.iSliderDragged = false;
         player.play();
         buffer.close();
     }

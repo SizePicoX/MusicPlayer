@@ -5,7 +5,9 @@
     <constraints>
       <xy x="48" y="54" width="436" height="297"/>
     </constraints>
-    <properties/>
+    <properties>
+      <preferredSize width="174" height="260"/>
+    </properties>
     <border type="none"/>
     <children>
       <component id="c22d4" class="javax.swing.JTextArea" binding="tipsInfo">

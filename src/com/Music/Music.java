@@ -18,7 +18,7 @@ public class Music implements Serializable{
     private String SongTime;//歌曲时长
     private String mp3FilePath;//存储这首歌曲的路径，每次修改都应当被更新
 
-
+    private int ID3InfoLength;//ID3头部文件长度
     /**根据给出的MP3文件路径，初始化MP3文件的主要信息
      * @param mp3FilePath  给定的MP3文件路径
      * @return 返回一个记载MP3文件基本信息的字符串数组
@@ -28,7 +28,8 @@ public class Music implements Serializable{
      * 2.专辑
      * 3.乐曲时长
      * 4.MP3文件路径
-     * P.S.该数组大小为5，当解码失败时返回null
+     * 5.ID3头部文件长度
+     * P.S.该数组大小为6，当解码失败时返回null
      */
     public  static String[] setMusicInfo(String mp3FilePath){
         /* 记载MP文件基本信息的数组，函数结束后返回 */
@@ -69,6 +70,7 @@ public class Music implements Serializable{
         Album = MusicInfo[2];//专辑
         SongTime = MusicInfo[3];//歌曲时长
         mp3FilePath = MusicInfo[4];//MP3文件路径
+        ID3InfoLength = Integer.valueOf(MusicInfo[5]);//ID3头部文件长度
     }
     public String getSongName() {
         return SongName;
@@ -93,5 +95,9 @@ public class Music implements Serializable{
     public boolean isSame(Music selectedMusic){
         return SongName.equals(selectedMusic.SongName) && Artist.equals(selectedMusic.Artist) &&
                 Album.equals(selectedMusic.Album) && SongTime.equals(selectedMusic.SongTime);
+    }
+
+    public int getID3InfoLength() {
+        return ID3InfoLength;
     }
 }

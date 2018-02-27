@@ -34,5 +34,4 @@ public class Tips extends JDialog {
         /* 设置对话框弹出的位置 */
         setLocation(point);
     }
-
 }

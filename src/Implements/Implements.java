@@ -199,4 +199,45 @@ public class Implements {
             return ensureNotNull(node);
         }
     }
+
+    private static int[] next;
+
+    private static void getNext(char[] subStrArray){
+        int i = 0,j = -1;//i为假主串指针,j为假子串指针
+        next = new int[subStrArray.length];
+        next[0] = -1;
+        while (i < subStrArray.length){
+            if (j == -1 || subStrArray[i] == subStrArray[j]){
+                ++i;
+                ++j;
+                next[i - 1] = j - 1;
+            }else
+                j = next[j];
+        }
+    }
+
+    public static int KMP(String str,String subStr){
+        char[] strArray = str.trim().toCharArray();
+        char[] subStrArray = subStr.trim().toCharArray();
+        //获取next数组
+        getNext(subStrArray);
+        //开始KMP
+        int i = 0,j = 0;//i为主串指针,j为子串指针
+        while (i < strArray.length && j < subStrArray.length){
+            char s1 = strArray[i];
+            char s2 = ' ';
+            //当j为-1时代表此时没有找到下一个位置.
+            if (j != -1) s2 = subStrArray[j];
+            if (j == -1 || ((s1 == s2) || (Character.toLowerCase(s1) == s2) || (Character.toUpperCase(s1) == s2))){
+                ++i;
+                ++j;
+            }
+            else {
+                j = next[j];
+            }
+        }
+        if (j == subStrArray.length) return i - subStrArray.length;
+        //没有找到则返回-1
+        return -1;
+    }
 }

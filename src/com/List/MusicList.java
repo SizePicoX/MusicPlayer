@@ -93,8 +93,7 @@ import java.io.*;
      * @param MusicListName 创建新的播放列表时指定的播放列表名字
      */
     public void setInitFileName(String MusicListName){
-        // TODO: 2018/2/8 创建新列表时，应当不允许同名
-        this.initFileName = MusicListName + ".ser";
+        this.initFileName = MusicListName;
         /* 将用户新建播放列表对应的链表的序列化文件的相对路径添加到数组 */
         MusicPlayer.TotalMusicListFileName.add(MusicPlayer.sum,MusicListName);
         /* 将用户新建的MusicList对象添加到数组,并且列表总数加1 */

@@ -27,7 +27,7 @@ public class CloudMusic extends JFrame implements Runnable{
     private JLabel songList;//"我的歌单"标签
     private JButton addSongList;//添加歌单按钮
     private JScrollPane musicListScrollPane;
-    private JList<String> musicList;//当前所有乐曲列表
+    public JList<String> musicList;//当前所有乐曲列表
     /* music组件 */
     private JPanel music;//music主面板
     private JPanel musicListOperationAndLabelPanel;//对musicList的相关操作及label的面板
@@ -39,7 +39,6 @@ public class CloudMusic extends JFrame implements Runnable{
     private JLabel songTime;//时长
     private JPanel musicListOperation;//musicList的相关操作面板
     private JButton addSongs;//添加乐曲
-    private JButton matchSongs;//匹配乐曲
     private JTextField searchSongs;//搜索乐曲
     private JButton cleanSearchField;
     private JPanel currentMusicListPanel;//当前显示的乐曲列表的面板
@@ -63,7 +62,7 @@ public class CloudMusic extends JFrame implements Runnable{
     private JButton maxiMize;//最大化
 
     //GUI主面板所管理的JList的数据模式
-    private static DefaultListModel<String> musicListModel;
+    public static DefaultListModel<String> musicListModel;
     private static DefaultListModel<String> currentMusicListModel;
 
     /* 拖动CloudMusic相关 */
@@ -71,9 +70,12 @@ public class CloudMusic extends JFrame implements Runnable{
     private static Point end_point;
 
     /**
-     * 记录每首乐曲开始播放时的时间
+     * 记录每首乐曲开始播放时对应的系统时刻
+     * 每次使用当前系统播放时间减去starTime则得到当前播放时刻
      */
-    public static long currentTime;
+    public static long starTime;
+
+
     /**
 
      * 标记是否全屏.
@@ -95,6 +97,11 @@ public class CloudMusic extends JFrame implements Runnable{
      * 标记currentOperationList是否被更新
      */
     private static boolean isMusicListUpdate = false;
+
+    /**
+     * 标记进度条是否被拖拽
+     */
+    public static boolean iSliderDragged = false;
 
     /**
      * 当前正在操作的音乐播放列表.一定是所有播放列表中的一个.
@@ -181,7 +188,7 @@ public class CloudMusic extends JFrame implements Runnable{
             setCursorAndDraggableForTitleBar(component);
         }
         /* 其他需要设定鼠标经过光标的组件的数组 */
-        JComponent[] components = {priorMusic,nextMusic,play_pause,playMode,addSongList, addSongs, matchSongs,cleanSearchField};
+        JComponent[] components = {priorMusic,nextMusic,play_pause,playMode,addSongList, addSongs,cleanSearchField};
         /* 为playModule组件组件设定UI */
         for (JComponent component : components){
             setCursorForComponent(component);
@@ -269,6 +276,10 @@ public class CloudMusic extends JFrame implements Runnable{
 
         //初始化musicList
         musicListModel = new DefaultListModel<>();
+        for (int i = 0; i < MusicPlayer.TotalMusicListFileName.size() ; ++i){
+            musicListModel.addElement(MusicPlayer.TotalMusicListFileName.get(i));
+        }
+        //导入用户数据
         musicList.setModel(musicListModel);
         //将JList添加到ScrollPane
         musicListScrollPane.setViewportView(musicList);
@@ -281,18 +292,40 @@ public class CloudMusic extends JFrame implements Runnable{
                 AddList addList = new AddList(point);
                 addList.pack();
                 addList.setVisible(true);
-                // TODO: 2018/2/22 这里添加创建歌单的代码
-                // TODO: 2018/2/22 不允许有相同名字的歌单
+                String str = addList.songListName;
+                if (str != null){
+                    //创建MusicList对象
+                    MusicList newList = new MusicList();
+                    newList.setInitFileName(str);
+                    //刷新GUI
+                    musicListModel.addElement(str);
+                }
             }
         });
         //musicList的监听器.双击以转到选定歌单
         musicList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                //双击则显示所选择列表的歌单
                 if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2){
                     JList list = (JList) e.getSource();
                     int index = list.getSelectedIndex();
-                    // TODO: 2018/2/22 这里添加musicList相关代码
+                    //更新当前正在操作的链表
+                    currentOperationList = MusicPlayer.TotalMusicList.get(index);
+                    //更新GUI
+                    musicListName.setText(currentOperationList.toString());
+                    SwingUtilities.invokeLater(() -> {
+                        currentMusicListModel.clear();
+                        int cnt = currentOperationList.sum;
+                        if (cnt != 0){
+                            MusicNode node = currentOperationList.getFirstMusic();
+                            while (cnt > 0){
+                                currentMusicListModel.addElement(Implements.renderer(node.toString()));
+                                node = node.next;
+                                --cnt;
+                            }
+                        }
+                    });
                 }
             }
         });
@@ -302,6 +335,8 @@ public class CloudMusic extends JFrame implements Runnable{
      * 为music设置监听器
      */
     private void initForMusic(){
+        //初始化musicListName标签
+        musicListName.setText(MusicPlayer.currentMusicList.toString());
         //初始化currentMusicList
         currentMusicListModel = new DefaultListModel<>();
         currentMusicList.setModel(currentMusicListModel);
@@ -324,8 +359,7 @@ public class CloudMusic extends JFrame implements Runnable{
                 fileChooser.addChoosableFileFilter(filterMp3);
 //                fileChooser.addChoosableFileFilter(filterWMA);
 //                fileChooser.addChoosableFileFilter(filterWAV);
-                int returnVal;
-                returnVal = fileChooser.showOpenDialog(cloudMusic);
+                int returnVal = fileChooser.showOpenDialog(cloudMusic);
                 //当用户点击确定按钮时才添加到链表
                 if (JFileChooser.APPROVE_OPTION == returnVal){
                     //根据用户选择的目录开始扫描mp3文件
@@ -358,13 +392,6 @@ public class CloudMusic extends JFrame implements Runnable{
                 }
             }
         });
-        //匹配乐曲
-        matchSongs.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                // TODO: 2018/2/21 匹配乐曲
-            }
-        });
         //搜索乐曲
         searchSongs.addKeyListener(new KeyAdapter() {
             @Override
@@ -391,7 +418,7 @@ public class CloudMusic extends JFrame implements Runnable{
                                     musicScanInfo[1] = node.music.getArtist();
                                     musicScanInfo[2] = node.music.getAlbum();
                                     for (int i = 0; i < 2 ; ++i){
-                                        if (musicScanInfo[i].contains(detectedText)){
+                                        if (Implements.KMP(musicScanInfo[i],detectedText) != -1){
                                             currentMusicListModel.addElement(Implements.renderer(node.toString()));
                                             scanMusicNodes.add(node);
                                             //标记当前检索成功
@@ -481,6 +508,13 @@ public class CloudMusic extends JFrame implements Runnable{
                 //使用鼠标左键双击时
                 if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2){
                     JList list = (JList) e.getSource();
+                    //表示是否替换了当前播放列表
+                    boolean flag = false;
+                    //当双击另外一个播放列表的音乐时，替换当前播放列表
+                    if (!MusicPlayer.currentMusicList.toString().equals(currentOperationList.toString())){
+                        MusicPlayer.currentMusicList = currentOperationList;
+                        flag = true;
+                    }
                     //当处于检索模式下，使用数组scanMusicNodes里面的数据来播放
                     if (isSearchSuccess){
                         //设定当前正在播放的乐曲
@@ -508,10 +542,9 @@ public class CloudMusic extends JFrame implements Runnable{
                         }
                     }
                     //当双击与当前播放乐曲不同的乐曲时才播放
-                    else if (MusicPlayer.getIndexOfCurrentMusicNode() != list.getSelectedIndex()){
+                    else if (flag || MusicPlayer.getIndexOfCurrentMusicNode() != list.getSelectedIndex()){
                         //设定当前正在播放的乐曲
                         MusicPlayer.setCurrentMusicNode(list.getSelectedIndex());
-
                         //暂停状态下播放选择的乐曲，则先唤醒再播放
                         if (!IS_PLAY_OR_PAUSE && CloudMusicThreadManager.playMusic.isAlive()){
                             CloudMusicThreadManager.playMusic.resume();
@@ -589,17 +622,16 @@ public class CloudMusic extends JFrame implements Runnable{
                 }
             }
         });
-        currentPlayTime.addMouseMotionListener(new MouseMotionAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                //获取拖动的数值
-
-            }
-        });
         currentPlayTime.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-                //在拖动结束才更新播放
+                //标记拖拽了进度条
+                iSliderDragged = true;
+                try {
+                    EnjoyYourMusic.buffer.close();
+                } catch (IOException e1) {
+                    // do nothing
+                }
             }
         });
     }
@@ -798,6 +830,7 @@ public class CloudMusic extends JFrame implements Runnable{
             if (IS_PLAY_OR_PAUSE){
                 CloudMusicThreadManager.playMusic.suspend();
                 CloudMusicThreadManager.musicProgressBar.suspend();
+
                 IS_PLAY_OR_PAUSE = false;
                 //修改CloudMusic相关图标及文字
                 play_pause.setSelected(false);
@@ -820,8 +853,15 @@ public class CloudMusic extends JFrame implements Runnable{
                     CloudMusicThreadManager.playMusic.start();
                     CloudMusicThreadManager.musicProgressBar.start();
                 }
+                //而启动了播放器线程，那么当然唤醒他们
                 else {
                     CloudMusicThreadManager.playMusic.resume();
+
+                    //获取恢复播放时时的系统时间播放进度
+                    //currentPlayTimeLabel.setText(currentPlayTimeLabel.getText());
+                    String[] str = currentPlayTimeLabel.getText().split(":");
+                    starTime = System.currentTimeMillis() - Integer.toUnsignedLong(Integer.parseInt(str[0]) * 60 * 1000 + Integer.parseInt(str[1]) * 1000);
+
                     CloudMusicThreadManager.musicProgressBar.resume();
                     IS_PLAY_OR_PAUSE = true;
                 }
@@ -840,8 +880,6 @@ public class CloudMusic extends JFrame implements Runnable{
 
     @Override
     public void run() {
-        //初始化CloudMusic
-        cloudMusic = getCloudMusic();
         //显示播放器主界面
         cloudMusic.setVisible(true);
     }
@@ -872,17 +910,19 @@ final class CloudMusicThreadManager {
             //设置当前进度条的最大值及label显示值
             CloudMusic.cloudMusic.songTimeLabel.setText(MusicPlayer.currentMusicNode.music.getSongTime());
             CloudMusic.cloudMusic.currentPlayTime.setMaximum(MusicPlayer.currentMusicNode.getSongTime());
-            //P.S.每首乐曲开始播放的时间 currentTime 已在EnjoyYourMusic.play方法中设定
+            //P.S.每首乐曲开始播放的时间 starTime 已在EnjoyYourMusic.play方法中设定
             //播放
             EnjoyYourMusic.play(MusicPlayer.currentMusicNode);
-            //自动连播
-            if (CloudMusic.isAutomaticPlay){
-                //非单曲循环时才调用getNext
-                if (MusicPlayer.currentPlayMode != PlayMode.Mode_Loop){
-                    MusicPlayer.currentMusicNode = MusicPlayer.getNextMusic();
+            if (!CloudMusic.iSliderDragged){
+                //自动连播
+                if (CloudMusic.isAutomaticPlay){
+                    //非单曲循环时才调用getNext
+                    if (MusicPlayer.currentPlayMode != PlayMode.Mode_Loop){
+                        MusicPlayer.currentMusicNode = MusicPlayer.getNextMusic();
+                    }
                 }
+                CloudMusic.isAutomaticPlay = true;
             }
-            CloudMusic.isAutomaticPlay = true;
         }
     });
 
@@ -893,8 +933,10 @@ final class CloudMusicThreadManager {
         //用于屏蔽不晓得哪里来的bug
         boolean flag = true;
         while (true){
-            int currentTime = (int)((System.currentTimeMillis() -  CloudMusic.currentTime) / 1000);
+            int currentTime = (int)((System.currentTimeMillis() -  CloudMusic.starTime) / 1000);
+            //更新进度条位置
             CloudMusic.cloudMusic.currentPlayTime.setValue(currentTime);
+            //更新标签显示时间
             if (!flag){
                 CloudMusic.cloudMusic.currentPlayTimeLabel.setText(String.valueOf(currentTime / 60) + ":" + String.valueOf(currentTime % 60));
             }

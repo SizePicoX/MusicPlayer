@@ -29,7 +29,8 @@ public class START {
             tips.setVisible(true);
         }
 
-        Thread cloudMusicThread = new Thread(CloudMusic.getCloudMusic(),"cloudMusicThread");
+        CloudMusic.cloudMusic = CloudMusic.getCloudMusic();
+        Thread cloudMusicThread = new Thread(CloudMusic.cloudMusic,"cloudMusicThread");
         cloudMusicThread.start();
         //初始化MiniCloudMusic
         MiniCloudMusic.miniCloudMusic = MiniCloudMusic.getMiniCloudMusic();

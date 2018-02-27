@@ -45,7 +45,6 @@ class LabelHeader {
             根据ID3标签的标准，通过按位与运算得到下面的算法
              */
             Size = (buf[6] & 0X7F) * 0x200000 + (buf[7] & 0X7F) * 0x400 + (buf[8] & 0X7F) * 0X80 +(buf[9] & 0X7F);
-            //此时构造函数成功
             isModify = true;
         }catch (UnsupportedEncodingException ex){
             ex.printStackTrace();

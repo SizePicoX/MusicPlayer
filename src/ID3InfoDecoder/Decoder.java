@@ -40,7 +40,7 @@ public class Decoder {
         String SongTime = null;
         File file = new File(mp3FilePath);
         try{
-            FileInputStream fis=new FileInputStream(file);
+            FileInputStream fis = new FileInputStream(file);
             try {
                 int b=fis.available();
                 Bitstream bt=new Bitstream(fis);
@@ -131,10 +131,11 @@ public class Decoder {
      * Artist(ID3标签为：TPE1),歌手
      * Album(ID3标签为：TALB),专辑
      * SongTime(ID3标签为：TIME),歌曲时长
+     * ID3头部文件长度
      * MP3文件路径
      */
     public String[] getMusicInfo() throws UnsupportedEncodingException {
-        String[] MusicInfo = new String[5];
+        String[] MusicInfo = new String[6];
         /*--------------------------------------------------------------------------------------------------------------
         开始解码
         --------------------------------------------------------------------------------------------------------------*/
@@ -177,6 +178,7 @@ public class Decoder {
         //此时解码成功，
         //MusicInfo的5号元素置为当前MP3文件路径
         MusicInfo[4] = mp3FilePath;
+        MusicInfo[5] = Integer.toString(frameSize + 10);
         return MusicInfo;
     }
 
