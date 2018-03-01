@@ -49,12 +49,12 @@ public class MusicPlayer implements Serializable,PlayMode {
     /**
      * 播放器的音量
      */
-    public static int volume;
+    private static int volume;
 
     /**
      * 当前进度条的位置
      */
-    public static double currentPlayTime;
+    public static int currentPlayTime;
 
 
     /**
@@ -86,23 +86,23 @@ public class MusicPlayer implements Serializable,PlayMode {
      * 记录下本次播放器启动后的随机播放产生的访问序列
        以播放器启动时的currentMusicNode为原点，随机访问模式下调用getNextMusic方法得到的访问序列
      */
-    private  static ArrayList<MusicNode> nextMusic = new ArrayList<>(45);
+    private  static ArrayList<MusicNode> nextMusic;
 
     /**
      * 用来访问 nextMusic 的指针,指向栈顶(即最近添加进去的元素)，值为-1的时候表示没有元素
      */
-    private static int indexOfNext = -1;
+    private static int indexOfNext;
 
     /**
      * 记录下本次播放器启动后的随机播放产生的访问序列
      以播放器启动时的currentMusicNode为原点，随机访问模式下调用getPriorMusic方法得到的访问序列
      */
-    private  static ArrayList<MusicNode> priorMusic = new ArrayList<>(45);
+    private  static ArrayList<MusicNode> priorMusic;
 
     /**
      * 用来访问 priorMusic 的指针,指向栈顶(即最近添加进去的元素)，值为-1的时候表示没有元素
      */
-    private static int indexOfPrior = -1;
+    private static int indexOfPrior;
 
 
     /**
@@ -110,7 +110,7 @@ public class MusicPlayer implements Serializable,PlayMode {
      * nextMusic 或者 priorMusic 写入不同的 MusicNode 的次数
      * P.S.与 maxCall 协调使用
      */
-    private static int callCount = 1;
+    private static int callCount;
 
 
       /**
@@ -131,11 +131,6 @@ public class MusicPlayer implements Serializable,PlayMode {
     }
     /*--------------------------------------------------------------------------------------------------------------
             播放器的初始化和保存方法
-    --------------------------------------------------------------------------------------------------------------*/
-    /*--------------------------------------------------------------------------------------------------------------
-     // TODO: 2018/2/8 重写初始化方法和保存方法 以及考察 setIndexOfCurrentMusicNode 方法
-     // TODO: 2018/2/8  !!!!!!!!!!!!!!!!!
-     // TODO: 2018/2/8  !!!!!!!!!!!!!!!!!
     --------------------------------------------------------------------------------------------------------------*/
     /**
      * 初始化方法
@@ -207,7 +202,7 @@ public class MusicPlayer implements Serializable,PlayMode {
             indexOfCurrentMusicNode = Integer.valueOf(userSettingValue[1]);
             currentPlayMode = Integer.valueOf(userSettingValue[2]);
             volume = Integer.valueOf(userSettingValue[3]);
-            currentPlayTime = Double.valueOf(userSettingValue[4]);
+            currentPlayTime = Integer.valueOf(userSettingValue[4]);
             sum = Integer.valueOf(userSettingValue[5]);
 
             /* 开始匹配用户播放列表段 */
@@ -234,7 +229,7 @@ public class MusicPlayer implements Serializable,PlayMode {
                         if (line.trim().split(";")[0].equals("")){
                             continue;
                         }
-                        if (line.contains("TotalMusicListFilePath[" + i + "]")){
+                        if (line.contains("TotalMusicListFileName[" + i + "]")){
                             TotalMusicListFileName.add(line.trim().split(";")[0].split(" = ")[1]);
                             ++i;
                         }
@@ -243,7 +238,6 @@ public class MusicPlayer implements Serializable,PlayMode {
             }
             /* 关闭流 */
             reader.close();
-
             /* 使用 TotalMusicListFileName 来初始化 TotalMusicList */
             for (int i = 0; i < sum ; ++i){
                 TotalMusicList.add(new MusicList(TotalMusicListFileName.get(i)));
@@ -252,8 +246,8 @@ public class MusicPlayer implements Serializable,PlayMode {
             initCurrentMusicList(indexOfCurrentMusicList);
             initCurrentMusicNode(indexOfCurrentMusicNode);
 
-            //初始化随机播放时，最大的产生不同随机乐曲的次数
-            maxCall = currentMusicList.sum < 11 ? currentMusicList.sum - 1 : 10;
+            //设定随机播放相关字段
+            setRandomPlay(currentMusicList.sum);
 
         }catch (IOException ex){
             ex.printStackTrace();
@@ -311,7 +305,7 @@ public class MusicPlayer implements Serializable,PlayMode {
             /* 播放音量 */
             userSettingValue[3] = Integer.toString(volume);
             /* 当前进度条的位置 */
-            userSettingValue[4] = Double.toString(currentPlayTime);
+            userSettingValue[4] = Integer.toString(currentPlayTime);
             /* 乐曲列表总数 */
             userSettingValue[5] = Integer.toString(sum);
 
@@ -388,7 +382,7 @@ public class MusicPlayer implements Serializable,PlayMode {
                 /* 当匹配到了对应段(MusicListPath),则更新对应字段 */
                 if (m.matches()){
                     for (int n = 0; n < TotalMusicListFileName.size(); ++n){
-                        String str = "TotalMusicListFileName[" + n + "]" + " = " + TotalMusicListFileName.get(i);
+                        String str = "TotalMusicListFileName[" + n + "]" + " = " + TotalMusicListFileName.get(n);
                         fileContent.add(str);
                     }
                     break;
@@ -423,9 +417,8 @@ public class MusicPlayer implements Serializable,PlayMode {
             while (!currentMusicNode.equals(node)){
                 node = node.next;
                 ++cnt;
-                System.out.println(cnt);
             }
-            return  cnt;
+            return cnt;
         }
         else return -1;
     }
@@ -434,7 +427,7 @@ public class MusicPlayer implements Serializable,PlayMode {
      * 在save方法中调用，以设定indexOfCurrentMusicList
      * @return 当前播放列表在 TotalMusicList 数组中的位置
      */
-    private static int getIndexOfCurrentMusicList() {
+    public static int getIndexOfCurrentMusicList() {
         return TotalMusicList.indexOf(currentMusicList);
     }
     /**
@@ -451,14 +444,6 @@ public class MusicPlayer implements Serializable,PlayMode {
     /*--------------------------------------------------------------------------------------------------------------
             播放器的set方法
     --------------------------------------------------------------------------------------------------------------*/
-    /**
-     * 设定当前正在播放的乐曲列表
-     * @param indexOfCurrentMusicList 当前播放列表在数组中的位置
-     */
-
-     public static void setCurrentMusicList(int indexOfCurrentMusicList){
-         initCurrentMusicList(indexOfCurrentMusicList);
-     }
     /**
      * 初始化播放器时调用，根据上一次的记录以恢复当前播放列表
      * @param indexOfCurrentMusicList  当前播放列表在数组中的位置
@@ -768,13 +753,22 @@ public class MusicPlayer implements Serializable,PlayMode {
         }
         return null;
     }
-    /**
-     * 调用线程中断使得播放暂停
-     */
-    public static void pause(){
-        // TODO: 2018/2/7  调用线程wait使得播放暂停
-    }
 
+    public static void setRandomPlay(int sum){
+        //初始化随机播放时，最大的产生不同随机乐曲的次数
+        maxCall = sum < 11 ? sum - 1 : 10;
+        nextMusic = new ArrayList<>(45);
+        if (nextMusic.size() != 0){
+            nextMusic.clear();
+        }
+        priorMusic = new ArrayList<>(45);
+        if (priorMusic.size() != 0){
+            priorMusic.clear();
+        }
+        indexOfNext = -1;
+        indexOfPrior= -1;
+        callCount = 1;
+    }
     /**
      *删除选定的音乐播放列表
      * P.S.无法删除默认列表.同时，GUI中不应当有默认列表的删除键

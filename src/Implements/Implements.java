@@ -1,18 +1,11 @@
 package Implements;
 
 
-import com.List.MusicList;
 import com.List.MusicNode;
-import com.Music.Music;
 import com.MusicPlayer;
 
-import javax.swing.filechooser.FileFilter;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Random;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * 工具类，用于：
@@ -50,28 +43,6 @@ public class Implements {
         //正向偏移返回正数，反向偏移返回负数
         if (flag) return result;
         return (-1) * result;
-    }
-    /**
-     * 删除指定文件夹下所有非文件夹的文件
-     * @param selectedFolder  指定的文件夹
-     */
-    public static boolean deleteMusicDirectory(File selectedFolder){
-        /* 当给定的文件不是文件夹时 */
-        if (selectedFolder.isFile()){
-            return selectedFolder.delete();
-        }
-        /* 当给定的文件是文件夹时，则递归调用以删除其中的非文件夹文件 */
-        else {
-            String[] childFilePath = selectedFolder.list();
-            if (childFilePath != null) {
-                for (String path : childFilePath){
-                    File selectedFile = new File(selectedFolder.getAbsolutePath() + "\\" + path);
-                    deleteMusicDirectory(selectedFile);
-                }
-            }
-            /* 删除文件夹 */
-            return selectedFolder.delete();
-        }
     }
 
     /**

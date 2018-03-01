@@ -1,7 +1,4 @@
-import CloudMusicGUI.CloudMusic;
-import CloudMusicGUI.CloudMusicTray;
-import CloudMusicGUI.MiniCloudMusic;
-import CloudMusicGUI.Tips;
+import CloudMusicGUI.*;
 import com.MusicPlayer;
 
 import java.awt.*;
@@ -28,7 +25,10 @@ public class START {
             tips.pack();
             tips.setVisible(true);
         }
-
+        //初始化右键菜单
+        CurrentMusicListRightButtonMenu.currentMusicListRightButtonMenu = CurrentMusicListRightButtonMenu.getCurrentMusicListRightButtonMenu();
+        MusicListRightButtonMenu.musicListRightButtonMenu = MusicListRightButtonMenu.getMusicListRightButtonMenu();
+        //初始化CloudMusic
         CloudMusic.cloudMusic = CloudMusic.getCloudMusic();
         Thread cloudMusicThread = new Thread(CloudMusic.cloudMusic,"cloudMusicThread");
         cloudMusicThread.start();

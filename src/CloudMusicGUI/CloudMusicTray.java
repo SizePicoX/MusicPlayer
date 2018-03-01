@@ -107,18 +107,6 @@ public class CloudMusicTray {
         menu.add(nextMusic);//下一首
         menu.add(exit);//退出
 
-        menu.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseExited(MouseEvent e) {
-                super.mouseExited(e);
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-
-            }
-        });
-
         //设置系统托盘图标
         String tooltip = MusicPlayer.getCurrentMusicInfo();
         ImageIcon icon = new ImageIcon("src\\icon\\formatTrayIcon.png");
@@ -288,8 +276,7 @@ public class CloudMusicTray {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1){
-                    // TODO: 2018/2/16 MusicPlayer的Save方法
-                    //MusicPlayer.Save();
+                    MusicPlayer.Save();
                     System.exit(0);
                 }
             }

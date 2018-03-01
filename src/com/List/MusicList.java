@@ -1,10 +1,12 @@
 package com.List;
 
-import Implements.Implements;
+import CloudMusicGUI.CloudMusic;
+import CloudMusicGUI.Tips;
 import Error.InitException;
 import Error.InitError;
 import com.MusicPlayer;
 
+import java.awt.*;
 import java.io.*;
 
 /*--------------------------------------------------------------------------------------------------------------
@@ -59,17 +61,13 @@ import java.io.*;
             Init(initFileName);
         }catch (InitException ex){
             int errorCode = ex.getErrorCode();
-            /* 将输出给用户看的错误信息 */
-            String errorMessage = ex.getMessage();
             switch (errorCode){
                 /* 初始化时，由于某种原因，文件的部分数据丢失，仅成功初始化了一部分,可能文件部分损坏 */
                 case InitError.Part_File_Unreadable :{
-                    // TODO: 2018/2/8 使用GUI告诉用户文件部分损坏
                     break;
                 }
                 /* 初始化时，整个文件都无法读取,说明可能文件损坏 */
                 case InitError.File_Unreadable :{
-                    // TODO: 2018/2/8 使用GUI告诉用户文件全部损坏
                     break;
                 }
             }
@@ -138,9 +136,11 @@ import java.io.*;
         /* 初始化内存中的链表 */
         try {
             /* 打开流文件 */
-            FileInputStream fs = new FileInputStream(initFileName);
+            String filePath = "src\\serFile\\" + initFileName + ".ser";
+            FileInputStream fs = new FileInputStream(filePath);
             ObjectInputStream os = new ObjectInputStream(fs);
-            /* 从流中读取第一歌节点 */
+            /* 从流中读取第一个节点 */
+            os.readObject();
             FirstMusic = (MusicNode)os.readObject();
             /* 乐曲总数加1 */
             ++sum;
@@ -176,7 +176,8 @@ import java.io.*;
             int i = 0;
             MusicNode node = FirstMusic;
             try {
-                FileOutputStream fs = new FileOutputStream(initFileName);
+                String filePath = "src\\serFile\\" + initFileName + ".ser";
+                FileOutputStream fs = new FileOutputStream(filePath);
                 ObjectOutputStream os = new ObjectOutputStream(fs);
                 /* 先将上一次的序列化文件清空 */
                 os.writeObject(null);
@@ -188,6 +189,7 @@ import java.io.*;
                 while (i < sum){
                     os.writeObject(node);
                     node = node.next;
+                    ++i;
                 }
                 os.close();
             } catch (IOException ex){
@@ -229,10 +231,10 @@ import java.io.*;
 
     /**
      * @param selectedNode 用于从歌曲链表中删除选定的歌曲
-     * @param isDeleteOrNot 为true时，表示连同选定的歌曲的源文件也给删除
+     * @param isDeleteSourceOrNot 为true时，表示连同选定的歌曲的源文件也给删除
      * @return 当且仅当删除源文件失败时才返回false.节点的删除不可能失败
      */
-    public boolean deleteSong(MusicNode selectedNode,boolean isDeleteOrNot){
+    public boolean deleteSong(MusicNode selectedNode,boolean isDeleteSourceOrNot){
         //当选定的节点不是第一首乐曲也不是最后一首时
         if (selectedNode != FirstMusic && selectedNode != LastMusic){
             //修改指针
@@ -268,8 +270,9 @@ import java.io.*;
         }
         boolean result = true;
         //如果用户选择删除源文件时
-        if (isDeleteOrNot){
+        if (isDeleteSourceOrNot){
             File file = new File(selectedNode.music.getMp3FilePath());
+            System.gc();//强制删除JAVA虚拟机正在占用的资源
             result = file.delete();
         }
         //释放指针
@@ -281,6 +284,7 @@ import java.io.*;
         //当删除源文件失败时，才返回false.链表的删除不可能失败
         return result;
     }
+
     @Override
     public String toString() {
         return initFileName;

@@ -139,7 +139,7 @@ public class MiniCloudMusic extends JFrame {
             }
         });
 
-        /* play_pause */
+        /* play */
         play_pause.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {

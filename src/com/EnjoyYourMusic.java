@@ -1,6 +1,7 @@
 package com;
 
 import CloudMusicGUI.CloudMusic;
+import CloudMusicGUI.CurrentMusicListRightButtonMenu;
 import com.List.MusicNode;
 import javazoom.jl.decoder.JavaLayerException;
 
@@ -24,6 +25,10 @@ public class EnjoyYourMusic {
      * 播放MP3音频
      */
     private static void playMP3(MusicNode currentMusicNode)throws IOException,JavaLayerException{
+//        if (!CloudMusic.flag){
+//            buffer = new BufferedInputStream(new FileInputStream(currentMusicNode.music.getMp3FilePath()));
+//            CloudMusic.flag = false;
+//        }
         buffer = new BufferedInputStream(new FileInputStream(currentMusicNode.music.getMp3FilePath()));
         javazoom.jl.player.Player player = new javazoom.jl.player.Player(buffer);
         //获取当前播放时间
