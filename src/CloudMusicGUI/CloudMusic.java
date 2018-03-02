@@ -110,9 +110,9 @@ public class CloudMusic extends JFrame implements Runnable{
     public static boolean isReplaceCurrentMusicList = false;
 
     /**
-     * 用于恢复上一次的播放进度
+     * 用于实现断点播放
      */
-    public static boolean flag = false;
+    public static boolean flag;
 
     /**
      * 当前正在操作的音乐播放列表.一定是所有播放列表中的一个.
@@ -642,28 +642,6 @@ public class CloudMusic extends JFrame implements Runnable{
     private void initForPlayModule(){
         //初始化播放模组
         playMode.setSelectedIndex(MusicPlayer.currentPlayMode);
-        //初始化currentPlayTimeLabel以及进度条
-        if (MusicPlayer.currentMusicNode != null){
-            currentPlayTimeLabel.setText(String.valueOf(MusicPlayer.currentPlayTime / 60) + ":" + String.valueOf(MusicPlayer.currentPlayTime % 60));
-            songTimeLabel.setText(MusicPlayer.currentMusicNode.music.getSongTime());
-            currentPlayTime.setMaximum(MusicPlayer.currentMusicNode.getSongTime());
-            currentPlayTime.setValue(MusicPlayer.currentPlayTime);
-            //将播放流放置到指定的位置
-            try {
-                double percent = (currentPlayTime.getValue() * 1.0) / (currentPlayTime.getMaximum() * 1.0);
-                //计算本次偏移所需要的偏移量
-                //如果是320的比特率的话才能精准的找到偏移位置.这是当前一大不足.
-                String[] songTime = MusicPlayer.currentMusicNode.music.getSongTime().split(":");
-                int offset = MusicPlayer.currentMusicNode.music.getID3InfoLength() +
-                        (Integer.parseInt(songTime[0]) * 60 + Integer.parseInt(songTime[1])) * 320 * 1000 / 8;
-                EnjoyYourMusic.buffer = new BufferedInputStream(new FileInputStream(MusicPlayer.currentMusicNode.music.getMp3FilePath()));
-                EnjoyYourMusic.buffer.skip((long)(offset * percent));
-                //用于恢复上一次的播放进度
-                flag = true;
-            } catch (IOException e) {
-                //do nothing
-            }
-        }
 
         priorMusic.addMouseListener(new MouseAdapter() {
             @Override
@@ -851,6 +829,7 @@ public class CloudMusic extends JFrame implements Runnable{
             if (!IS_PLAY_OR_PAUSE){
                 CloudMusicThreadManager.playMusic.resume();
                 CloudMusicThreadManager.musicProgressBar.resume();
+                flag = false;
             }
 
             if (!CloudMusicThreadManager.playMusic.isAlive()){
@@ -862,6 +841,7 @@ public class CloudMusic extends JFrame implements Runnable{
                     EnjoyYourMusic.buffer.close();
                     EnjoyYourMusic.buffer = null;
                     isAutomaticPlay = false;
+                    flag = false;
                 } catch (IOException ex) {
                     //do nothing
                     //只是为了引发播放线程终止播放当前乐曲并播放选中的歌
@@ -885,6 +865,7 @@ public class CloudMusic extends JFrame implements Runnable{
             if (!IS_PLAY_OR_PAUSE){
                 CloudMusicThreadManager.playMusic.resume();
                 CloudMusicThreadManager.musicProgressBar.resume();
+                flag = false;
             }
 
             if (!CloudMusicThreadManager.playMusic.isAlive()){
@@ -896,6 +877,7 @@ public class CloudMusic extends JFrame implements Runnable{
                     EnjoyYourMusic.buffer.close();
                     EnjoyYourMusic.buffer = null;
                     isAutomaticPlay = false;
+                    flag = false;
                 } catch (IOException ex) {
                     //do nothing
                     //只是为了引发播放线程终止播放当前乐曲并播放选中的歌

@@ -25,14 +25,12 @@ public class EnjoyYourMusic {
      * 播放MP3音频
      */
     private static void playMP3(MusicNode currentMusicNode)throws IOException,JavaLayerException{
-//        if (!CloudMusic.flag){
-//            buffer = new BufferedInputStream(new FileInputStream(currentMusicNode.music.getMp3FilePath()));
-//            CloudMusic.flag = false;
-//        }
-        buffer = new BufferedInputStream(new FileInputStream(currentMusicNode.music.getMp3FilePath()));
+        if (!CloudMusic.flag){
+            buffer = new BufferedInputStream(new FileInputStream(currentMusicNode.music.getMp3FilePath()));
+            //获取当前播放时间
+            CloudMusic.starTime = System.currentTimeMillis();
+        }
         javazoom.jl.player.Player player = new javazoom.jl.player.Player(buffer);
-        //获取当前播放时间
-        CloudMusic.starTime = System.currentTimeMillis();
         if (CloudMusic.iSliderDragged){
             double percent = (CloudMusic.cloudMusic.currentPlayTime.getValue() * 1.0) / (CloudMusic.cloudMusic.currentPlayTime.getMaximum() * 1.0);
             //计算本次偏移所需要的偏移量
