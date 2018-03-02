@@ -292,14 +292,15 @@
             </constraints>
             <properties>
               <background color="-10241793"/>
+              <focusCycleRoot value="false"/>
               <maximum value="0"/>
               <minorTickSpacing value="0"/>
               <opaque value="false"/>
               <paintLabels value="false"/>
-              <paintTicks value="true"/>
+              <paintTicks value="false"/>
               <paintTrack value="true"/>
               <requestFocusEnabled value="true"/>
-              <snapToTicks value="false"/>
+              <snapToTicks value="true"/>
               <value value="0"/>
               <valueIsAdjusting value="false"/>
             </properties>

@@ -24,10 +24,12 @@ public class EnjoyYourMusic {
      * 播放MP3音频
      */
     private static void playMP3(MusicNode currentMusicNode)throws IOException,JavaLayerException{
+        //当不是断点播放时
         if (!CloudMusic.flag || CloudMusic.isPlayOtherMusic){
             buffer = new BufferedInputStream(new FileInputStream(currentMusicNode.music.getMp3FilePath()));
             //获取当前播放时间
             CloudMusic.starTime = System.currentTimeMillis();
+            CloudMusic.flag = false;
         }
         javazoom.jl.player.Player player = new javazoom.jl.player.Player(buffer);
         if (CloudMusic.iSliderDragged){

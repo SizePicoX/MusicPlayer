@@ -34,7 +34,8 @@ public class START {
         //初始化CloudMusic
         CloudMusic.cloudMusic = CloudMusic.getCloudMusic();
         Thread cloudMusicThread = new Thread(CloudMusic.cloudMusic,"cloudMusicThread");
-        //初始化currentPlayTimeLabel以及进度条
+
+        //实现断点播放
         if (MusicPlayer.currentMusicNode != null){
             CloudMusic.cloudMusic.currentPlayTimeLabel.setText(String.valueOf(MusicPlayer.currentPlayTime / 60) + ":" + String.valueOf(MusicPlayer.currentPlayTime % 60));
             CloudMusic.cloudMusic.songTimeLabel.setText(MusicPlayer.currentMusicNode.music.getSongTime());
@@ -57,6 +58,7 @@ public class START {
                 //do nothing
             }
         }
+
         cloudMusicThread.start();
         //初始化MiniCloudMusic
         MiniCloudMusic.miniCloudMusic = MiniCloudMusic.getMiniCloudMusic();

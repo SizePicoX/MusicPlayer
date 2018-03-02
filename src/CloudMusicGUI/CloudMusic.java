@@ -154,7 +154,7 @@ public class CloudMusic extends JFrame implements Runnable{
      */
     private CloudMusic(){
         /* 为CloudMusic设定UI */
-        //setUI();
+        setUI();
         add(CurrentMusicListRightButtonMenu.currentMusicListRightButtonMenu);
         add(MusicListRightButtonMenu.musicListRightButtonMenu);
         /* 设定组件的监听器 */
