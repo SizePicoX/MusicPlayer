@@ -343,14 +343,7 @@ public class CloudMusic extends JFrame implements Runnable{
                 else if (e.getButton() == MouseEvent.BUTTON3 && e.getClickCount() == 1){
                     int index = list.getSelectedIndex();
                     //必须选择一个歌单点击才弹出右键菜单
-                    if (MusicPlayer.TotalMusicList.size() != 0 && index != -1){
-                        //当选择的是默认列表时，不存在删除按钮
-                        if (index == 0){
-                            //去除删除按钮
-                            MusicListRightButtonMenu.musicListRightButtonMenu.initMenu(true);
-                        }
-                        //添加删除按钮
-                        else MusicListRightButtonMenu.musicListRightButtonMenu.initMenu(false);
+                    if (MusicPlayer.TotalMusicList.size() != 0 && index > 0){
                         //获取当前所选择的歌单
                         MusicListRightButtonMenu.musicListRightButtonMenu.selectedMusicList = MusicPlayer.TotalMusicList.get(index);
                         //显示菜单
