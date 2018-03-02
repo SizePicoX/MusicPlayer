@@ -5,7 +5,6 @@ import Implements.Implements;
 import com.List.MusicList;
 import com.List.MusicNode;
 import com.List.PlayMode;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -768,27 +767,5 @@ public class MusicPlayer implements Serializable,PlayMode {
         indexOfNext = -1;
         indexOfPrior= -1;
         callCount = 1;
-    }
-    /**
-     *删除选定的音乐播放列表
-     * P.S.无法删除默认列表.同时，GUI中不应当有默认列表的删除键
-     * @param IndexOfSelectedList 选定的将要被删除的节点的下标
-     */
-    public static void deleteMusicList(int IndexOfSelectedList){
-        /* 当选定的不是默认列表时 */
-        if (IndexOfSelectedList != 0){
-            TotalMusicListFileName.remove(IndexOfSelectedList);
-            MusicList list = TotalMusicList.get(IndexOfSelectedList);
-            MusicNode FirstMusic = list.getFirstMusic();
-            MusicNode node = FirstMusic;
-            int cnt = 0;
-            while (cnt < list.sum){
-                FirstMusic = FirstMusic.next;
-                MusicNode.DeleteSelectedNode(node);
-                node = FirstMusic;
-                ++cnt;
-            }
-            TotalMusicList.remove(IndexOfSelectedList);
-        }
     }
 }

@@ -1,7 +1,6 @@
 import CloudMusicGUI.*;
 import com.EnjoyYourMusic;
 import com.MusicPlayer;
-
 import java.awt.*;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
