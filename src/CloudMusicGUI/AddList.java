@@ -85,7 +85,7 @@ public class AddList extends JDialog {
 
     private void setUI(){
         /* 设置图标 */
-        ImageIcon icon = new ImageIcon("src\\icon\\tipsIcon.png");
+        ImageIcon icon = new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\tipsIcon.png");
         setIconImage(icon.getImage());
 
         MouseAdapter listener = new MouseAdapter() {

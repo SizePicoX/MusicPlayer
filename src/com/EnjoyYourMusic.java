@@ -24,7 +24,7 @@ public class EnjoyYourMusic {
      * 播放MP3音频
      */
     private static void playMP3(MusicNode currentMusicNode)throws IOException,JavaLayerException{
-        if (!CloudMusic.flag){
+        if (!CloudMusic.flag || CloudMusic.isPlayOtherMusic){
             buffer = new BufferedInputStream(new FileInputStream(currentMusicNode.music.getMp3FilePath()));
             //获取当前播放时间
             CloudMusic.starTime = System.currentTimeMillis();

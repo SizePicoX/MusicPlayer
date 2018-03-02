@@ -242,7 +242,6 @@
               <background color="-10241793"/>
               <borderPainted value="false"/>
               <focusPainted value="false"/>
-              <icon value="icon/priorMusic.png"/>
               <margin top="0" left="0" bottom="0" right="0"/>
               <text value=""/>
             </properties>
@@ -255,7 +254,6 @@
               <background color="-10241793"/>
               <borderPainted value="false"/>
               <focusPainted value="false"/>
-              <icon value="icon/nextMusic.png"/>
               <margin top="0" left="0" bottom="0" right="0"/>
               <text value=""/>
             </properties>
@@ -268,10 +266,8 @@
               <background color="-10241793"/>
               <borderPainted value="false"/>
               <focusPainted value="false"/>
-              <icon value="icon/play.png"/>
               <margin top="0" left="0" bottom="0" right="0"/>
               <selected value="false"/>
-              <selectedIcon value="icon/pause.png"/>
               <text value=""/>
             </properties>
           </component>
@@ -343,7 +339,6 @@
             </constraints>
             <properties>
               <font name="DialogInput" size="20" style="3"/>
-              <icon value="icon/titleIcon.png"/>
               <text value="CloudMusic"/>
             </properties>
           </component>
@@ -360,7 +355,6 @@
               <borderPainted value="false"/>
               <enabled value="true"/>
               <focusPainted value="false"/>
-              <icon value="icon/miniMode.png"/>
               <margin top="0" left="0" bottom="0" right="0"/>
               <text value=""/>
               <toolTipText value="mini模式"/>
@@ -378,7 +372,6 @@
               <background color="-10241793"/>
               <borderPainted value="false"/>
               <focusPainted value="false"/>
-              <icon value="icon/iconic.png"/>
               <margin top="0" left="0" bottom="0" right="0"/>
               <text value=""/>
               <toolTipText value="最小化"/>
@@ -396,7 +389,6 @@
               <background color="-10241793"/>
               <borderPainted value="false"/>
               <focusPainted value="false"/>
-              <icon value="icon/close.png"/>
               <margin top="0" left="0" bottom="0" right="0"/>
               <text value=""/>
               <toolTipText value="关闭"/>
@@ -415,10 +407,8 @@
               <borderPainted value="false"/>
               <focusPainted value="false"/>
               <foreground color="-10241793"/>
-              <icon value="icon/maxiMize.png"/>
               <margin top="0" left="0" bottom="0" right="0"/>
               <selected value="false"/>
-              <selectedIcon value="icon/normalSize.png"/>
               <text value=""/>
               <toolTipText value="最大化/最小化"/>
             </properties>

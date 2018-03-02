@@ -38,7 +38,6 @@
               <focusCycleRoot value="false"/>
               <focusPainted value="false"/>
               <focusTraversalPolicyProvider value="false"/>
-              <icon value="icon/priorMusic.png"/>
               <margin top="0" left="0" bottom="0" right="0"/>
               <opaque value="false"/>
               <preferredSize width="32" height="32"/>
@@ -55,12 +54,10 @@
               <borderPainted value="false"/>
               <enabled value="true"/>
               <focusPainted value="false"/>
-              <icon value="icon/play.png"/>
               <margin top="0" left="0" bottom="0" right="0"/>
               <opaque value="false"/>
               <preferredSize width="32" height="32"/>
               <selected value="false"/>
-              <selectedIcon value="icon/pause.png"/>
               <text value=""/>
             </properties>
           </component>
@@ -73,7 +70,6 @@
               <background color="-10241793"/>
               <borderPainted value="false"/>
               <focusPainted value="false"/>
-              <icon value="icon/nextMusic.png"/>
               <margin top="0" left="0" bottom="0" right="0"/>
               <opaque value="false"/>
               <preferredSize width="32" height="32"/>
@@ -106,7 +102,6 @@
               <focusPainted value="false"/>
               <focusable value="true"/>
               <foreground color="-4473925"/>
-              <icon value="icon/close.png"/>
               <margin top="0" left="0" bottom="0" right="0"/>
               <opaque value="false"/>
               <preferredSize width="32" height="32"/>
@@ -124,7 +119,6 @@
               <borderPainted value="false"/>
               <focusPainted value="false"/>
               <foreground color="-4473925"/>
-              <icon value="icon/maxiMizeOfMiniCloudMusic.png"/>
               <margin top="0" left="0" bottom="0" right="0"/>
               <preferredSize width="32" height="32"/>
               <text value=""/>

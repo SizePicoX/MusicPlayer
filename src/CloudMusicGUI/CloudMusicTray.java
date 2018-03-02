@@ -70,8 +70,8 @@ public class CloudMusicTray {
 
         /* 按钮的数组 */
         JMenuItem[] items = {play_pause,priorMusic,nextMusic,exit};
-        ImageIcon[] icons = {new ImageIcon("src\\icon\\playTrayIcon.png"),new ImageIcon("src\\icon\\priorTrayIcon.png"),
-                new ImageIcon("src\\icon\\nextTrayIcon.png"),new ImageIcon("src\\icon\\closeTrayIcon.png")};
+        ImageIcon[] icons = {new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\playTrayIcon.png"),new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\priorTrayIcon.png"),
+                new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\nextTrayIcon.png"),new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\closeTrayIcon.png")};
         /* 为所有AbstractButton设置UI和高亮 */
         for (int i = 0 ; i < items.length ; ++i){
             JMenuItem item = items[i];
@@ -109,7 +109,7 @@ public class CloudMusicTray {
 
         //设置系统托盘图标
         String tooltip = MusicPlayer.getCurrentMusicInfo();
-        ImageIcon icon = new ImageIcon("src\\icon\\formatTrayIcon.png");
+        ImageIcon icon = new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\formatTrayIcon.png");
         trayIcon = new TrayIcon(icon.getImage(), tooltip);
         /* 托盘图标监听器 */
         trayIcon.addMouseListener(new MouseAdapter() {
