@@ -137,7 +137,7 @@ public class MusicPlayer implements Serializable,PlayMode {
      */
     public static void Init(){
         /* 用户数据被保存的路径 */
-        String filePath = "src\\com\\config.ini";
+        String filePath = "D:\\JAVA CODE\\MusicPlayer\\config.ini";
 
         try {
 
@@ -271,7 +271,7 @@ public class MusicPlayer implements Serializable,PlayMode {
         indexOfCurrentMusicNode = getIndexOfCurrentMusicNode();
 
         /* 用户数据将被保存的绝对路径 */
-        String filePath = "src\\com\\config.ini";
+        String filePath = "D:\\JAVA CODE\\MusicPlayer\\config.ini";
 
         /* 保存音乐播放器的设置及用户播放列表 */
         try {

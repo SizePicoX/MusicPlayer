@@ -15,6 +15,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class CloudMusic extends JFrame implements Runnable{
@@ -185,7 +186,7 @@ public class CloudMusic extends JFrame implements Runnable{
      */
     private void setUI(){
         /* 设定图标 */
-        ImageIcon icon = new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\format.png");
+        ImageIcon icon = new ImageIcon("src\\icon\\format.png");
         setIconImage(icon.getImage());
 
         /* 设定LookAndFell */
@@ -640,13 +641,13 @@ public class CloudMusic extends JFrame implements Runnable{
      */
     private void initForPlayModule(){
         try{
-            ImageIcon priorMusic_icon = new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\priorMusic.png");
+            ImageIcon priorMusic_icon = new ImageIcon("src\\icon\\priorMusic.png");
             priorMusic.setIcon(priorMusic_icon);
-            ImageIcon play_icon = new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\play.png");
+            ImageIcon play_icon = new ImageIcon("src\\icon\\play.png");
             play_pause.setIcon(play_icon);
-            ImageIcon pause_icon = new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\pause.png");
+            ImageIcon pause_icon = new ImageIcon("src\\icon\\pause.png");
             play_pause.setSelectedIcon(pause_icon);
-            ImageIcon nextMusic_icon = new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\nextMusic.png");
+            ImageIcon nextMusic_icon = new ImageIcon("src\\icon\\nextMusic.png");
             nextMusic.setIcon(nextMusic_icon);
         }catch (NullPointerException ex){
             //do nothing
@@ -716,17 +717,17 @@ public class CloudMusic extends JFrame implements Runnable{
      * 为titleBar设定监听器
      */
     private void initForTitleBar(){
-        ImageIcon CloudMusic_icon = new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\titleIcon.png");
+        ImageIcon CloudMusic_icon = new ImageIcon("src\\icon\\titleIcon.png");
         CloudMusic.setIcon(CloudMusic_icon);
-        ImageIcon miniMode_icon = new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\miniMode.png");
+        ImageIcon miniMode_icon = new ImageIcon("src\\icon\\miniMode.png");
         miniMode.setIcon(miniMode_icon);
-        ImageIcon iconic_icon = new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\iconic.png");
+        ImageIcon iconic_icon = new ImageIcon("src\\icon\\iconic.png");
         iconic.setIcon(iconic_icon);
-        ImageIcon maxMize_icon = new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\maxiMize.png");
+        ImageIcon maxMize_icon = new ImageIcon("src\\icon\\maxiMize.png");
         maxiMize.setIcon(maxMize_icon);
-        ImageIcon icon = new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\normalSize.png");
+        ImageIcon icon = new ImageIcon("src\\icon\\normalSize.png");
         maxiMize.setSelectedIcon(icon);
-        ImageIcon close_icon = new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\close.png");
+        ImageIcon close_icon = new ImageIcon("src\\icon\\close.png");
         close.setIcon(close_icon);
 
         /* 启动mini模式 */
@@ -930,7 +931,7 @@ public class CloudMusic extends JFrame implements Runnable{
                 //修改MiniCloudMusic相关图标及文字
                 MiniCloudMusic.miniCloudMusic.play_pause.setSelected(false);
                 //修改CloudMusicTray相关图标及文字
-                CloudMusicTray.tray.play_pause.setIcon(new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\playTrayIcon.png"));
+                CloudMusicTray.tray.play_pause.setIcon(new ImageIcon("src\\icon\\playTrayIcon.png"));
                 CloudMusicTray.tray.play_pause.setText("播放");
                 CloudMusicTray.tray.play_pause.setSelected(false);
                 flag = false;
@@ -965,7 +966,7 @@ public class CloudMusic extends JFrame implements Runnable{
                 //修改MiniCloudMusic相关图标及文字
                 MiniCloudMusic.miniCloudMusic.play_pause.setSelected(true);
                 //修改CloudMusicTray相关图标及文字
-                CloudMusicTray.tray.play_pause.setIcon(new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\pauseTrayIcon.png"));
+                CloudMusicTray.tray.play_pause.setIcon(new ImageIcon("src\\icon\\pauseTrayIcon.png"));
                 CloudMusicTray.tray.play_pause.setText("暂停");
                 CloudMusicTray.tray.play_pause.setSelected(true);
             }
@@ -997,7 +998,7 @@ final class CloudMusicThreadManager {
             //为系统托盘和miniCloudMusic和CloudMusic的乐曲基本信息文本框设定提示文本.显示当前播放的乐曲
             String toolTipText = MusicPlayer.getCurrentMusicInfo();
             CloudMusicTray.tray.trayIcon.setToolTip(toolTipText);
-            CloudMusicTray.tray.play_pause.setIcon(new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\pauseTrayIcon.png"));
+            CloudMusicTray.tray.play_pause.setIcon(new ImageIcon());
             CloudMusicTray.tray.play_pause.setText("暂停");
             CloudMusicTray.tray.play_pause.setSelected(true);
             CloudMusic.cloudMusic.play_pause.setSelected(true);

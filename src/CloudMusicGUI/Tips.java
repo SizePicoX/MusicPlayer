@@ -14,7 +14,7 @@ public class Tips extends JDialog {
      */
     public Tips(String text, Point point) {
         /* 设置图标 */
-        ImageIcon icon = new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\tipsIcon.png");
+        ImageIcon icon = new ImageIcon("src\\icon\\tipsIcon.png");
         setIconImage(icon.getImage());
         /* 设定LookAndFell */
         String lookAndFeel = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";

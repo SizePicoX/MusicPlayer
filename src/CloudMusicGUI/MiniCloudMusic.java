@@ -79,20 +79,20 @@ public class MiniCloudMusic extends JFrame {
      */
     private void setUI(){
         /* 设定图标 */
-        ImageIcon icon = new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\format.png");
+        ImageIcon icon = new ImageIcon("src\\icon\\format.png");
         setIconImage(icon.getImage());
         //为组件设置图标
-        ImageIcon priorMusic_icon = new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\priorMusic.png");
+        ImageIcon priorMusic_icon = new ImageIcon("src\\icon\\priorMusic.png");
         priorMusic.setIcon(priorMusic_icon);
-        ImageIcon play_icon = new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\play.png");
+        ImageIcon play_icon = new ImageIcon("src\\icon\\play.png");
         play_pause.setIcon(play_icon);
-        ImageIcon pause_icon = new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\pause.png");
+        ImageIcon pause_icon = new ImageIcon("src\\icon\\pause.png");
         play_pause.setSelectedIcon(pause_icon);
-        ImageIcon nextMusic_icon = new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\nextMusic.png");
+        ImageIcon nextMusic_icon = new ImageIcon("src\\icon\\nextMusic.png");
         nextMusic.setIcon(nextMusic_icon);
-        ImageIcon close_icon = new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\close.png");
+        ImageIcon close_icon = new ImageIcon("src\\icon\\close.png");
         close.setIcon(close_icon);
-        ImageIcon enlarge_icon = new ImageIcon("D:\\JAVA CODE\\MusicPlayer\\icon\\maxiMizeOfMiniCloudMusic.png");
+        ImageIcon enlarge_icon = new ImageIcon("src\\icon\\maxiMizeOfMiniCloudMusic.png");
         enlarge.setIcon(enlarge_icon);
 
         /* 设定LookAndFell */
