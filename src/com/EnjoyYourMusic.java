@@ -29,8 +29,8 @@ public class EnjoyYourMusic {
             buffer = new BufferedInputStream(new FileInputStream(currentMusicNode.music.getMp3FilePath()));
             //获取当前播放时间
             CloudMusic.starTime = System.currentTimeMillis();
-            CloudMusic.flag = false;
         }
+        CloudMusic.flag = false;
         javazoom.jl.player.Player player = new javazoom.jl.player.Player(buffer);
         if (CloudMusic.iSliderDragged){
             double percent = (CloudMusic.cloudMusic.currentPlayTime.getValue() * 1.0) / (CloudMusic.cloudMusic.currentPlayTime.getMaximum() * 1.0);
